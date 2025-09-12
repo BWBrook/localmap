@@ -1,49 +1,73 @@
-# History files
+# R / RStudio
+.Rproj.user
 .Rhistory
-.Rapp.history
-
-# Session Data files
 .RData
-.RDataTmp
-
-# User-specific files
 .Ruserdata
+.Rprofile.user
+.DS_Store
 
-# Example code in package build process
-*-Ex.R
+# renv
+renv/library/
+renv/staging/
 
-# Output files from R CMD build
+# targets
+_targets/
+# optional frozen outputs from Quarto later
+.quarto/_freeze/
+.quarto/
+docs/_site/
+
+# data
+data/
+data-raw/
+data-raw/cache/
+inst/extdata/*.zip
+inst/extdata/*.gz
+
+# build / checks
+.Rcheck/
+
+# Global CSV ignore was masking versioned examples. Keep data/ ignored but
+# explicitly allow tracked sample/manifests.
+*.csv
+!inst/extdata/*.csv
+!metadata/*.csv
+
+# renv
+renv/library/
+renv/staging/
+
+# output files
+outputs/
+
 /*.tar.gz
+/*.zip
 
-# Output files from R CMD check
-/*.Rcheck/
-
-# RStudio files
-.Rproj.user/
-
-# produced vignettes
 vignettes/*.html
 vignettes/*.pdf
 
-# OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
-.httr-oauth
-
-# knitr and R markdown default cache directories
-*_cache/
-/cache/
-
-# Temporary files created by R markdown
-*.utf8.md
+# Quarto / rmarkdown artefacts
+*.html
 *.knit.md
+/report_files
+*.tex
+*.log
+*.aux
+*.toc
+*.pdf
+a*.md
 
-# R Environment Variables
-.Renviron
+# _targets
+/_targets/*
+/docs/ 
 
-# pkgdown site
-docs/
-
-# translation temp files
-po/*~
-
-# RStudio Connect folder
-rsconnect/
+# Misc
+.DS_Store
+.vscode/
+.idea/
+*.html
+*.png
+*.js
+*.css
+*.woff
+/Alroy/
