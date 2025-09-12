@@ -1,10 +1,10 @@
-Package: template
-Title: Project title
+Package: rcompendium
+Title: Generic R Compendium Template
 Version: 0.0.0.9000
 Authors@R: c(person(given = "Barry", family = "Brook", role = c("aut","cre")))
-Description: Reproducible template using 'renv', 'targets', 'Quarto'. It 
-    is structured as an R package so it can be loaded with 'devtools' or 
-    'pkgload' and used in a 'targets' pipeline.
+Description: A reproducible, generic R compendium template using 'renv',
+    'targets', and 'Quarto'. It is structured as an R package so it can be
+    loaded with 'devtools' or 'pkgload' and used in a 'targets' pipeline.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -16,19 +16,20 @@ Imports:
     readr,
     purrr,
     tidyr,
-    sf,
-    terra,
-    arrow,
-    duckdb,
+    tibble,
+    stringr,
     config,
     qs,
     lgr,
     progressr,
-    vroom,
     yaml,
     checkmate,
     janitor,
-    dotenv
+    dotenv,
+    here,
+    rlang,
+    cli,
+    import
 Suggests:
     testthat,
     lintr,
@@ -41,6 +42,9 @@ Suggests:
     future.batchtools,
     pak,
     renv,
-    pkgdown
+    pkgdown,
+    knitr,
+    rmarkdown
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
+VignetteBuilder: knitr

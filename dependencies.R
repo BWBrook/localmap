@@ -1,4 +1,4 @@
-# Dependency manifest for the rc-dates compendium
+# Dependency manifest for the generic compendium
 
 # Returns a character vector of required packages for this project.
 project_dependencies <- function() {

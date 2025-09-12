@@ -1,0 +1,26 @@
+---
+title: Development Notes
+format: gfm
+---
+
+This repository is a generic R compendium template.
+
+Conventions:
+
+- Dependencies managed with `renv`; do not commit large data.
+- Pipeline with `{targets}`; helpers live in `R/` and are sourced via `tar_source("R")`.
+- Use `import::from()` inside functions; avoid `library()` calls.
+- Tests in `tests/testthat/` with table-driven cases.
+- Small example data under `inst/extdata/`.
+
+Common tasks (run in RStudio Console):
+
+```r
+renv::restore(prompt = FALSE)
+source("dependencies.R")
+pak::pkg_install(project_dependencies())
+devtools::document()
+testthat::test_dir("tests/testthat", reporter = "summary")
+targets::tar_make()
+pkgdown::build_site(preview = FALSE)
+```

@@ -1,5 +1,5 @@
 project:
-  title: "dSDM"
+  title: "Project Template"
   type: website
   output-dir: outputs/quarto
 

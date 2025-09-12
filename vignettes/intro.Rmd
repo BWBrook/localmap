@@ -1,0 +1,30 @@
+---
+title: "Getting Started"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+This vignette introduces the generic compendium structure and shows how to
+access configuration and the input manifest without loading the package.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment = "#>", collapse = TRUE)
+```
+
+```{r}
+# Read config and manifest using fully-qualified calls
+cfg <- rcompendium::cfg_read()
+mf  <- rcompendium::read_manifest(cfg$data$manifest)
+mf
+```
+
+If you've executed the pipeline (`targets::tar_make()`), you can also read
+targets directly:
+
+```{r}
+# targets::tar_read(manifest_summary)
+```
+

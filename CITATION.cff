@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+title: "rcompendium"
+message: "If you use this template, please cite this repository."
+authors:
+  - family-names: Brook
+    given-names: Barry
+type: software
+version: 0.0.0.9000
+repository-code: https://example.org/your-repo-url
+license: MIT
+keywords:
+  - R
+  - compendium
+  - reproducible-research

@@ -1,0 +1,13 @@
+^_targets/\n
+^docs/\n
+^inst/extdata/cache/\n
+^\.github/\n
+^\.lintr$\n
+^\.quarto/\n
+^outputs/\n
+^profiles/\n
+^quarto\.yml$\n
+^rcompendium\.Rproj$\n
+^README\.md$\n
+^_pkgdown\.yml$\n
+^docs/pkgdown/\n

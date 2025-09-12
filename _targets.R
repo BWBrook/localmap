@@ -1,4 +1,4 @@
-# {targets} pipeline for rc-dates (minimal AustArch flow)
+## {targets} pipeline (generic template)
 
 targets::tar_option_set(
   seed = 1L,
@@ -16,15 +16,48 @@ list(
     description = "Project configuration (paths, compute flags)."
   ),
 
-  # Manifest and raw file paths
+  # Manifest of input files
   targets::tar_target(
     raw_manifest,
     read_manifest(cfg$data$manifest),
     description = "CSV manifest of input files."
   ),
 
-  # ADD OTHER TARGETS AS REQUIRED
-  
+  # Track file dependencies declared in the manifest (vector of paths)
+  targets::tar_target(
+    input_files,
+    raw_manifest$abs_path,
+    format = "file",
+    description = "File paths declared in the manifest (tracked as file deps)."
+  ),
+
+  # Lightweight preview of input CSVs (row/column counts)
+  targets::tar_target(
+    data_preview,
+    preview_manifest(raw_manifest, n_max = 100L),
+    description = "Per-file preview (n_rows, n_cols) for CSV inputs."
+  ),
+
+  # Combine CSV inputs when columns align across files
+  targets::tar_target(
+    combined_data,
+    combine_manifest_csvs(raw_manifest),
+    description = "Combined tibble of CSV inputs using common columns."
+  ),
+
+  # Example summary derived from the manifest
+  targets::tar_target(
+    manifest_summary,
+    {
+      dplyr::summarise(
+        raw_manifest,
+        n_rows = dplyr::n(),
+        n_files = dplyr::n_distinct(abs_path)
+      )
+    },
+    description = "Simple summary of the manifest contents."
+  ),
+
   # Report rendering: render to same directory as source file
   targets::tar_target(
     report,

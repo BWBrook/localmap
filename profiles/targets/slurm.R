@@ -5,7 +5,7 @@
 
 future::plan(
   future.batchtools::batchtools_slurm,
-  template = system.file("templates/batchtools/slurm.tmpl", package = "RRepoGoldStd")
+  template = file.path("inst", "templates", "batchtools", "slurm.tmpl")
 )
 
 ## Optionally respect config for default workers

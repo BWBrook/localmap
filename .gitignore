@@ -1,5 +1,5 @@
 # R / RStudio
-.Rproj.user
+.Rproj.user/
 .Rhistory
 .RData
 .Ruserdata
@@ -12,62 +12,44 @@ renv/staging/
 
 # targets
 _targets/
-# optional frozen outputs from Quarto later
-.quarto/_freeze/
+
+# Quarto
 .quarto/
+.quarto/_freeze/
 docs/_site/
 
-# data
+# data (raw or large) — track only small samples in inst/extdata
 data/
 data-raw/
 data-raw/cache/
 inst/extdata/*.zip
 inst/extdata/*.gz
+docs/*.md
+a*.md
 
 # build / checks
 .Rcheck/
 
-# Global CSV ignore was masking versioned examples. Keep data/ ignored but
-# explicitly allow tracked sample/manifests.
-*.csv
-!inst/extdata/*.csv
-!metadata/*.csv
-
-# renv
-renv/library/
-renv/staging/
-
-# output files
+# outputs
 outputs/
-
 /*.tar.gz
 /*.zip
 
+# vignette/build artefacts
 vignettes/*.html
 vignettes/*.pdf
 
-# Quarto / rmarkdown artefacts
-*.html
+# rmarkdown/quarto temporary artefacts
 *.knit.md
 /report_files
 *.tex
 *.log
 *.aux
 *.toc
-*.pdf
-a*.md
 
-# _targets
+# _targets cache (explicit)
 /_targets/*
-/docs/ 
 
-# Misc
-.DS_Store
+# Editors
 .vscode/
 .idea/
-*.html
-*.png
-*.js
-*.css
-*.woff
-/Alroy/

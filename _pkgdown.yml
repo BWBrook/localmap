@@ -1,0 +1,31 @@
+template:
+  bootstrap: 5
+
+destination: docs/pkgdown
+
+url: ~
+
+home:
+  title: rcompendium
+  description: Generic R compendium template
+
+navbar:
+  structure:
+    left: [reference, articles]
+    right: [search]
+
+reference:
+  - title: Configuration
+    contents:
+      - cfg_read
+  - title: Manifests
+    contents:
+      - read_manifest
+      - preview_manifest
+      - combine_manifest_csvs
+
+articles:
+  - title: Vignettes
+    contents:
+      - vignettes/intro.Rmd
+

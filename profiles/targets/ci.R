@@ -6,4 +6,4 @@
 ## TARGETS_PROFILE=ci in your CI scripts.
 
 future::plan(future::sequential)
-options(gold.sample_frac = 0.02)  # Example option; respect this in code
+options(project.sample_frac = 0.02)  # Example option; respect this in code

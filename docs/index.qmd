@@ -1,0 +1,27 @@
+---
+title: Project Template
+format: html
+---
+
+Welcome to the generic R compendium template.
+
+- Environment: `renv`
+- Pipeline: `{targets}`
+- Tests: `{testthat}`
+- Docs: Quarto (`docs/` and `reports/`)
+
+Quick links:
+
+- Pipeline overview: `docs/PIPELINE.md`
+- Development notes: `docs/DEVELOPMENT.qmd`
+- Report: `reports/paper.qmd`
+
+Run locally (RStudio Console):
+
+```r
+renv::restore(prompt = FALSE)
+source("dependencies.R")
+pak::pkg_install(project_dependencies())
+targets::tar_make()
+```
+
