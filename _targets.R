@@ -1,4 +1,4 @@
-## {targets} pipeline (generic template)
+## localmap {targets} pipeline
 
 targets::tar_option_set(
   seed = 1L,

@@ -1,5 +1,5 @@
 project:
-  title: "Project Template"
+  title: "localmap"
   type: website
   output-dir: outputs/quarto
 

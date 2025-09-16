@@ -1,15 +1,17 @@
-# rcompendium
+# localmap
 
-Generic R compendium template for reproducible projects using renv, targets, and Quarto.
+Localmap bundles the scaffolding we need to source, clean, and map species occurrence
+data. The repository keeps the reproducible tooling from the template but orients it
+squarely around biodiversity workflows.
 
-- Reproducible env with `renv`
-- Pipeline with `{targets}`
+- Reproducible environment with `renv`
+- Pipeline orchestrated by `{targets}`
 - Tests with `{testthat}`
-- Docs with Quarto under `docs/` and `reports/`
- - Vignettes under `vignettes/`
- - Package site with `pkgdown` (configured for `docs/pkgdown/`)
+- Documentation via Quarto in `docs/` and long-form reports under `reports/`
+  - Vignettes under `vignettes/`
+  - Package site configured for `docs/pkgdown/`
 
-Quick start (in RStudio Console):
+Quick start (run in the RStudio Console):
 
 ```r
 renv::restore(prompt = FALSE)
@@ -40,10 +42,10 @@ pkgdown::build_site(preview = FALSE)
 Browse the vignette:
 
 ```r
-utils::browseVignettes(package = "rcompendium")
+utils::browseVignettes(package = "localmap")
 ```
 
-Key targets out of the box:
+Key targets available out of the box:
 
 - `cfg`: configuration list
 - `raw_manifest`: parsed input manifest
@@ -53,4 +55,4 @@ Key targets out of the box:
 - `manifest_summary`: counts and distinct file metrics
 - `report`: renders `reports/paper.qmd`
 
-See `docs/DEVELOPMENT.qmd` for notes and conventions.
+See `docs/DEVELOPMENT.qmd` for project conventions and additional guidance.

@@ -1,9 +1,8 @@
----
-title: Project Template
+title: localmap Overview
 format: html
 ---
 
-Welcome to the generic R compendium template.
+Welcome to localmap, the species occurrence mapping compendium.
 
 - Environment: `renv`
 - Pipeline: `{targets}`
@@ -24,4 +23,3 @@ source("dependencies.R")
 pak::pkg_install(project_dependencies())
 targets::tar_make()
 ```
-

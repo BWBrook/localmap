@@ -25,6 +25,7 @@ data-raw/cache/
 inst/extdata/*.zip
 inst/extdata/*.gz
 docs/*.md
+src/
 a*.md
 
 # build / checks

@@ -3,7 +3,8 @@ title: Development Notes
 format: gfm
 ---
 
-This repository is a generic R compendium template.
+This repository hosts localmap, the species occurrence sourcing and mapping
+workflow.
 
 Conventions:
 

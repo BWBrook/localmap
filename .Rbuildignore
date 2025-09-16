@@ -7,7 +7,7 @@
 ^outputs/\n
 ^profiles/\n
 ^quarto\.yml$\n
-^rcompendium\.Rproj$\n
+^localmap\.Rproj$\n
 ^README\.md$\n
 ^_pkgdown\.yml$\n
 ^docs/pkgdown/\n

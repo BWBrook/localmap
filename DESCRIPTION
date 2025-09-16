@@ -1,10 +1,11 @@
-Package: rcompendium
-Title: Generic R Compendium Template
+Package: localmap
+Title: Local Species Occurrence Mapping Toolkit
 Version: 0.0.0.9000
 Authors@R: c(person(given = "Barry", family = "Brook", role = c("aut","cre")))
-Description: A reproducible, generic R compendium template using 'renv',
-    'targets', and 'Quarto'. It is structured as an R package so it can be
-    loaded with 'devtools' or 'pkgload' and used in a 'targets' pipeline.
+Description: Tools for sourcing, harmonising, and mapping species occurrence data
+    managed by the Localmap project. The compendium keeps the reproducible
+    workflow conventions from the template, integrating 'renv', 'targets', and
+    'Quarto' to support transparent biodiversity analyses.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

@@ -1,4 +1,4 @@
-# Dependency manifest for the generic compendium
+# Dependency manifest for the localmap compendium
 
 # Returns a character vector of required packages for this project.
 project_dependencies <- function() {

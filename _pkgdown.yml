@@ -6,8 +6,8 @@ destination: docs/pkgdown
 url: ~
 
 home:
-  title: rcompendium
-  description: Generic R compendium template
+  title: localmap
+  description: Toolkit for species occurrence sourcing and mapping
 
 navbar:
   structure:
@@ -28,4 +28,3 @@ articles:
   - title: Vignettes
     contents:
       - vignettes/intro.Rmd
-
