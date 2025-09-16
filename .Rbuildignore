@@ -1,3 +1,5 @@
+^renv$
+^renv\.lock$
 ^_targets/\n
 ^docs/\n
 ^inst/extdata/cache/\n
@@ -11,3 +13,4 @@
 ^README\.md$\n
 ^_pkgdown\.yml$\n
 ^docs/pkgdown/\n
+^\.Rproj\.user$
