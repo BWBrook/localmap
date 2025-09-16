@@ -8,11 +8,12 @@
 #' @return A tibble with columns `id`, `path`, `exists`, `n_rows`, `n_cols`.
 #' @export
 preview_manifest <- function(manifest, n_max = 100L) {
-  import::from("readr", read_csv)
-  import::from("dplyr", tibble, mutate, select, bind_rows)
-  import::from("tibble", tibble)
-  import::from("cli", cli_warn)
-  import::from("rlang", abort)
+  fn_env <- environment()
+  import::from("readr", read_csv, .into = fn_env)
+  import::from("dplyr", tibble, mutate, select, bind_rows, .into = fn_env)
+  import::from("tibble", tibble, .into = fn_env)
+  import::from("cli", cli_warn, .into = fn_env)
+  import::from("rlang", abort, .into = fn_env)
 
   if (!all(c("id", "path", "abs_path") %in% names(manifest))) {
     abort("`manifest` must contain id, path, abs_path columns.", class = "preview_manifest_bad_cols")

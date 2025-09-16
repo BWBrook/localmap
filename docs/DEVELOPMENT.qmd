@@ -13,6 +13,12 @@ Conventions:
 - Use `import::from()` inside functions; avoid `library()` calls.
 - Tests in `tests/testthat/` with table-driven cases.
 - Small example data under `inst/extdata/`.
+- Species queries live in `metadata/species_requests.csv`; add rows with
+  `species_id`, `common_name`, and/or `scientific_name`. The pipeline resolves
+  names via `{galah}` and downloads occurrences into `species_occurrences`.
+  Set occurrence filters (year, state province, optional latitude, polygon
+  boundaries) in `config/config.yaml` under `data$occurrence`. Ensure the ALA
+  section includes a valid email and `download_reason_id`.
 
 Common tasks (run in RStudio Console):
 

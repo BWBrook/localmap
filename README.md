@@ -47,6 +47,10 @@ utils::browseVignettes(package = "localmap")
 
 Key targets available out of the box:
 
+- `ala_config`: galah configuration derived from `config/config.yaml`
+- `species_requests`: parsed species query definitions (`metadata/species_requests.csv`)
+- `species_taxa`: resolved species metadata from the Atlas of Living Australia
+- `species_occurrences`: occurrence records retrieved via galah
 - `cfg`: configuration list
 - `raw_manifest`: parsed input manifest
 - `input_files`: file paths tracked as dependencies (format = "file")
@@ -56,3 +60,16 @@ Key targets available out of the box:
 - `report`: renders `reports/paper.qmd`
 
 See `docs/DEVELOPMENT.qmd` for project conventions and additional guidance.
+
+## Species occurrence retrieval
+
+Provide species definitions in `metadata/species_requests.csv` with columns
+`species_id`, `common_name`, and `scientific_name` (at least one of the names
+must be supplied). The pipeline resolves those names against the Atlas of Living
+Australia using `{galah}` and stores the results in the `species_occurrences`
+target. Set the `ALA_EMAIL` environment variable (or edit
+`config/config.yaml` → `ala$email`) so galah can authenticate with the API and
+provide a valid `download_reason_id` (defaults to 4, “Scientific research”).
+Configure temporal, jurisdiction, and optional latitude filters under
+`config/config.yaml` → `data$occurrence` (e.g., `min_year`, `state_province`,
+and `min_lat`).

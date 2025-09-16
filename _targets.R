@@ -11,9 +11,48 @@ targets::tar_source("R")
 list(
   # Configuration
   targets::tar_target(
+    cfg_file,
+    here::here("config", "config.yaml"),
+    format = "file",
+    description = "Path to the YAML configuration file (tracked for changes)."
+  ),
+  targets::tar_target(
     cfg,
-    cfg_read(),
+    cfg_read(config_path = cfg_file),
     description = "Project configuration (paths, compute flags)."
+  ),
+
+  targets::tar_target(
+    ala_config,
+    ala_configure(cfg$ala),
+    description = "Configured galah options for ALA access."
+  ),
+
+  targets::tar_target(
+    species_requests,
+    read_species_requests(cfg$data$species_requests),
+    description = "Species queries supplied via CSV (common and scientific names)."
+  ),
+
+  targets::tar_target(
+    species_taxa,
+    ala_resolve_species(species_requests),
+    description = "Resolved species metadata from the Atlas of Living Australia."
+  ),
+
+  targets::tar_target(
+    species_occurrences,
+    ala_fetch_occurrences(
+      taxa = species_taxa,
+      min_year = cfg$data$occurrence$min_year,
+      boundary = cfg$data$occurrence$boundary,
+      boundary_simplify = cfg$data$occurrence$boundary_simplify,
+      columns = cfg$data$occurrence$fields,
+      min_lat = cfg$data$occurrence$min_lat,
+      state_province = cfg$data$occurrence$state_province,
+      config = ala_config
+    ),
+    description = "Occurrence records retrieved from the Atlas of Living Australia."
   ),
 
   # Manifest of input files

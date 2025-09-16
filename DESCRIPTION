@@ -30,7 +30,10 @@ Imports:
     here,
     rlang,
     cli,
-    import
+    httr2,
+    import,
+    galah,
+    sf
 Suggests:
     testthat,
     lintr,
@@ -39,6 +42,7 @@ Suggests:
     roxygen2,
     rcmdcheck,
     devtools,
+    pkgload,
     future,
     future.batchtools,
     pak,
@@ -49,3 +53,4 @@ Suggests:
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+RoxygenNote: 7.3.3

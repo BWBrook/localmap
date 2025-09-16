@@ -4,6 +4,28 @@ default:
   sample_frac: 1.0
   data:
     manifest: "metadata/data_manifest.csv"
+    species_requests: "metadata/species_requests.csv"
+    occurrence:
+      min_year: 2000
+      min_lat: null
+      state_province: "Tasmania"
+      boundary: null
+      boundary_simplify: 1000
+      fields:
+        - decimalLatitude
+        - decimalLongitude
+        - eventDate
+        - vernacularName
+        - scientificName
+        - dataResourceName
+        - taxonConceptID
+
+  ala:
+    email: "barry.brook@utas.edu.au"
+    atlas: "ALA"
+    caching: true
+    verbose: false
+    download_reason_id: 4
 
 local:
   inherits: default

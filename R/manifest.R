@@ -7,14 +7,15 @@
 #' @return A tibble with columns `id`, `path`, and `abs_path`.
 #' @export
 read_manifest <- function(manifest_path) {
-  import::from("here", here)
-  import::from("readr", read_csv)
-  import::from("dplyr", mutate)
-  import::from("tibble", tibble)
-  import::from("stringr", str_trim)
-  import::from("checkmate", assert_subset, assert_names, any_string, assert_file_exists)
-  import::from("cli", cli_warn, cli_inform)
-  import::from("rlang", abort)
+  fn_env <- environment()
+  import::from("here", here, .into = fn_env)
+  import::from("readr", read_csv, .into = fn_env)
+  import::from("dplyr", mutate, .into = fn_env)
+  import::from("tibble", tibble, .into = fn_env)
+  import::from("stringr", str_trim, .into = fn_env)
+  import::from("checkmate", assert_names, .into = fn_env)
+  import::from("cli", cli_warn, cli_inform, .into = fn_env)
+  import::from("rlang", abort, .into = fn_env)
 
   if (!is.character(manifest_path) || length(manifest_path) != 1L) {
     abort("`manifest_path` must be a single character string.", class = "read_manifest_bad_path")

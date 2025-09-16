@@ -4,14 +4,21 @@
 #' `Sys.getenv("R_CONFIG_ACTIVE", "default")`). Returns a named list.
 #'
 #' @param profile Character scalar. Config profile name.
+#' @param config_path Optional path to the YAML file. Defaults to
+#'   `here::here("config", "config.yaml")`.
 #' @return A named list with configuration values.
 #' @export
-cfg_read <- function(profile = Sys.getenv("R_CONFIG_ACTIVE", "default")) {
-  import::from("here", here)
-  import::from("config", get)
-  import::from("rlang", abort)
+cfg_read <- function(profile = Sys.getenv("R_CONFIG_ACTIVE", "default"),
+                     config_path = NULL) {
+  fn_env <- environment()
+  import::from("here", here, .into = fn_env)
+  import::from("config", get, .into = fn_env)
+  import::from("rlang", abort, .into = fn_env)
 
-  path <- here("config", "config.yaml")
+  if (is.null(config_path)) {
+    config_path <- here("config", "config.yaml")
+  }
+  path <- config_path
   if (!file.exists(path)) {
     abort(
       c(
@@ -28,4 +35,3 @@ cfg_read <- function(profile = Sys.getenv("R_CONFIG_ACTIVE", "default")) {
   }
   cfg
 }
-

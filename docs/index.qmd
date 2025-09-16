@@ -8,12 +8,14 @@ Welcome to localmap, the species occurrence mapping compendium.
 - Pipeline: `{targets}`
 - Tests: `{testthat}`
 - Docs: Quarto (`docs/` and `reports/`)
+- Species data sourced with `{galah}` from the Atlas of Living Australia
 
 Quick links:
 
 - Pipeline overview: `docs/PIPELINE.md`
 - Development notes: `docs/DEVELOPMENT.qmd`
 - Report: `reports/paper.qmd`
+- Species requests: `metadata/species_requests.csv`
 
 Run locally (RStudio Console):
 

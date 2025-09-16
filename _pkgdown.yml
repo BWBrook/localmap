@@ -23,6 +23,13 @@ reference:
       - read_manifest
       - preview_manifest
       - combine_manifest_csvs
+  - title: Atlas of Living Australia
+    contents:
+      - read_species_requests
+      - ala_resolve_species
+      - ala_fetch_occurrences
+      - ala_default_occurrence_fields
+      - ala_configure
 
 articles:
   - title: Vignettes

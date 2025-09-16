@@ -5,7 +5,7 @@ project_dependencies <- function() {
   c(
     # pipeline & IO
     "targets", "tarchetypes", "here", "yaml", "config",
-    "arrow", "duckdb", "qs", "vroom", "fs",
+    "galah", "httr2", "arrow", "duckdb", "qs", "vroom", "fs",
     # wrangling & utils
     "dplyr", "readr", "purrr", "tidyr", "tibble", "stringr", "magrittr", "checkmate", "janitor",
     # spatial
@@ -19,7 +19,7 @@ project_dependencies <- function() {
     # ergonomics & errors
     "cli", "rlang", "import",
     # dev
-    "testthat", "lintr", "styler", "devtools", "pak", "renv", "quarto"
+    "testthat", "lintr", "styler", "devtools", "pkgload", "pak", "renv", "quarto"
   )
 }
 

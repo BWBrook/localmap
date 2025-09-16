@@ -21,6 +21,14 @@ mf  <- localmap::read_manifest(cfg$data$manifest)
 mf
 ```
 
+```{r}
+#| eval: false
+# Resolve species queries defined in metadata/species_requests.csv
+requests <- localmap::read_species_requests(cfg$data$species_requests)
+resolved <- localmap::ala_resolve_species(requests)
+head(resolved)
+```
+
 If you've executed the pipeline (`targets::tar_make()`), you can also read
 targets directly:
 
