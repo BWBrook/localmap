@@ -33,7 +33,11 @@ Imports:
     httr2,
     import,
     galah,
-    sf
+    sf,
+    ggplot2,
+    geosphere,
+    rnaturalearth,
+    rnaturalearthdata
 Suggests:
     testthat,
     lintr,

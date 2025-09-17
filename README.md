@@ -51,6 +51,8 @@ Key targets available out of the box:
 - `species_requests`: parsed species query definitions (`metadata/species_requests.csv`)
 - `species_taxa`: resolved species metadata from the Atlas of Living Australia
 - `species_occurrences`: occurrence records retrieved via galah
+- `species_map`: static map image highlighting occurrence points within the
+  configured bounding box
 - `cfg`: configuration list
 - `raw_manifest`: parsed input manifest
 - `input_files`: file paths tracked as dependencies (format = "file")
@@ -72,4 +74,25 @@ target. Set the `ALA_EMAIL` environment variable (or edit
 provide a valid `download_reason_id` (defaults to 4, “Scientific research”).
 Configure temporal, jurisdiction, and optional latitude filters under
 `config/config.yaml` → `data$occurrence` (e.g., `min_year`, `state_province`,
-and `min_lat`).
+and `min_lat`). To generate maps, set `data$occurrence$map` with a bounding
+box, for example:
+
+```
+data:
+  occurrence:
+    map:
+      basemap: rnaturalearth
+      show_title: false
+      show_legend: false
+      point_colour: "#2ca25f"
+      point_size: 1.6
+      bounding_box:
+        top_left:
+          lat: -40.2
+          lon: 144.0
+        length_km: 400
+      output_path: outputs/maps/species_occurrences.png
+```
+
+The bounding box approach ensures the map covers Tasmania for the current
+lyrebird case study while remaining configurable for future species.

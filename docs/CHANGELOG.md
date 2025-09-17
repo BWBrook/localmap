@@ -18,6 +18,11 @@ The format follows Keep a Changelog. This project adheres to Semantic Versioning
 - Hard-code the galah pipeline as a literal string (`galah_call() |> ...`)
   because galah 2.x rejects dynamically constructed quosures; do not refactor
   to tidy-eval forms unless the upstream API changes.
+- Static mapping utilities for occurrence points, including the
+  `map_species_occurrences()` helper and `species_map` target that renders a
+  bounding-box constrained image.
+- Configuration entries for mapping (bounding box, basemap, output path) under
+  `data$occurrence$map`.
 
 ### Changed
 - Rename project metadata, Quarto site, and pkgdown home content from `rcompendium`
@@ -27,6 +32,9 @@ The format follows Keep a Changelog. This project adheres to Semantic Versioning
   species occurrence mapping focus.
 - Expand `_targets.R` with ALA configuration, species resolution, and
   occurrence download targets.
+- Default species map styling now hides the title/legend, removes the bounding
+  box overlay, and uses smaller green points (configurable via
+  `data$occurrence$map`).
 
 ### Fixed
 - n/a

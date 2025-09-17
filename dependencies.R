@@ -9,7 +9,7 @@ project_dependencies <- function() {
     # wrangling & utils
     "dplyr", "readr", "purrr", "tidyr", "tibble", "stringr", "magrittr", "checkmate", "janitor",
     # spatial
-    "sf", "terra",
+    "sf", "terra", "geosphere", "rnaturalearth", "rnaturalearthdata",
     # modelling / methods
     "yardstick",
     # parallel & progress & logging

@@ -19,6 +19,18 @@ default:
         - scientificName
         - dataResourceName
         - taxonConceptID
+      map:
+        basemap: "rnaturalearth"
+        show_title: false
+        show_legend: false
+        point_colour: "#2ca25f"
+        point_size: 1.6
+        bounding_box:
+          top_left:
+            lat: -40.2
+            lon: 144.0
+          length_km: 400
+        output_path: "outputs/maps/species_occurrences.png"
 
   ala:
     email: "barry.brook@utas.edu.au"

@@ -55,6 +55,16 @@ list(
     description = "Occurrence records retrieved from the Atlas of Living Australia."
   ),
 
+  targets::tar_target(
+    species_map,
+    map_species_occurrences(
+      occurrences = species_occurrences,
+      mapping_settings = cfg$data$occurrence$map
+    ),
+    format = "file",
+    description = "Static map visualising species occurrences within the configured bounding box."
+  ),
+
   # Manifest of input files
   targets::tar_target(
     raw_manifest,

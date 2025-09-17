@@ -5,7 +5,7 @@ species occurrence data products.
 
 Current DAG (conceptual):
 - `cfg` -> `ala_config`
-- `cfg` -> `species_requests` -> `species_taxa` -> `species_occurrences`
+- `cfg` -> `species_requests` -> `species_taxa` -> `species_occurrences` -> `species_map`
 - `cfg` -> `raw_manifest` -> `input_files` -> `data_preview` -> `combined_data` -> `manifest_summary` -> `report`
 
 Key targets:
@@ -18,6 +18,8 @@ Key targets:
 - `species_occurrences`: Downloads occurrence records for each resolved species
   and returns a tidy tibble with metadata (honouring configuration for minimum
   year, state province, latitude threshold, and optional boundary geometry).
+- `species_map`: Produces a static map image using the configured bounding box
+  to visualise the occurrence points by species.
 - `cfg`: Loads configuration from `config/config.yaml`; ensure the ALA section
   defines a valid email and `download_reason_id`.
 - `raw_manifest`: Reads `metadata/data_manifest.csv` to enumerate input files.
