@@ -3148,6 +3148,42 @@
       "Maintainer": "Lionel Henry <lionel@posit.co>",
       "Repository": "CRAN"
     },
+    "maptiles": {
+      "Package": "maptiles",
+      "Version": "0.10.0",
+      "Source": "Repository",
+      "Title": "Download and Display Map Tiles",
+      "Authors@R": "c(person(given = \"Timothée\",  family = \"Giraud\", email = \"timothee.giraud@cnrs.fr\",  role = c(\"cre\",\"aut\"),  comment = c(ORCID = \"0000-0002-1932-3323\")),  person(given = \"Diego\", family = \"Hernangómez\", role = c(\"ctb\"), comment = c(ORCID = \"0000-0001-8457-4658\")),  person(given = \"Robert J.\",  family = \"Hijmans\",  role = c(\"ctb\"),  comment = c(ORCID = \"0000-0001-5872-2872\")),  person(given = \"Hugh A.\",  family = \"Graham\",  role = c(\"ctb\")))",
+      "Description": "To create maps from tiles, 'maptiles' downloads, composes and displays tiles from a large number of providers (e.g. 'OpenStreetMap', 'Stadia', 'Esri', 'CARTO', or 'Thunderforest').",
+      "URL": "https://github.com/riatelab/maptiles/",
+      "BugReports": "https://github.com/riatelab/maptiles/issues/",
+      "License": "GPL-3",
+      "Depends": [
+        "R (>= 3.5.0)"
+      ],
+      "Imports": [
+        "sf",
+        "curl",
+        "digest",
+        "graphics",
+        "grDevices",
+        "png",
+        "terra (>= 1.8-21)",
+        "tools",
+        "slippymath",
+        "utils"
+      ],
+      "Suggests": [
+        "covr",
+        "tinytest"
+      ],
+      "Encoding": "UTF-8",
+      "RoxygenNote": "7.3.2",
+      "NeedsCompilation": "no",
+      "Author": "Timothée Giraud [cre, aut] (ORCID: <https://orcid.org/0000-0002-1932-3323>), Diego Hernangómez [ctb] (ORCID: <https://orcid.org/0000-0001-8457-4658>), Robert J. Hijmans [ctb] (ORCID: <https://orcid.org/0000-0001-5872-2872>), Hugh A. Graham [ctb]",
+      "Maintainer": "Timothée Giraud <timothee.giraud@cnrs.fr>",
+      "Repository": "CRAN"
+    },
     "memoise": {
       "Package": "memoise",
       "Version": "2.0.1",
@@ -3578,6 +3614,23 @@
       "NeedsCompilation": "no",
       "Author": "Hadley Wickham [aut], Winston Chang [aut], Jim Hester [aut], Lionel Henry [aut, cre], Posit Software, PBC [cph, fnd], R Core team [ctb] (Some namespace and vignette code extracted from base R)",
       "Maintainer": "Lionel Henry <lionel@posit.co>",
+      "Repository": "CRAN"
+    },
+    "png": {
+      "Package": "png",
+      "Version": "0.1-8",
+      "Source": "Repository",
+      "Title": "Read and write PNG images",
+      "Author": "Simon Urbanek <Simon.Urbanek@r-project.org>",
+      "Maintainer": "Simon Urbanek <Simon.Urbanek@r-project.org>",
+      "Depends": [
+        "R (>= 2.9.0)"
+      ],
+      "Description": "This package provides an easy and simple way to read, write and display bitmap images stored in the PNG format. It can read and write both files and in-memory raw vectors.",
+      "License": "GPL-2 | GPL-3",
+      "SystemRequirements": "libpng",
+      "URL": "http://www.rforge.net/png/",
+      "NeedsCompilation": "yes",
       "Repository": "CRAN"
     },
     "potions": {
@@ -4147,6 +4200,48 @@
       "Author": "Hadley Wickham [trl, cre, cph], RStudio [cph], Sridhar Ratnakumar [aut], Trent Mick [aut], ActiveState [cph] (R/appdir.r, R/cache.r, R/data.r, R/log.r translated from appdirs), Eddy Petrisor [ctb], Trevor Davis [trl, aut], Gabor Csardi [ctb], Gregory Jefferis [ctb]",
       "Maintainer": "Hadley Wickham <hadley@rstudio.com>",
       "Repository": "https://packagemanager.posit.co/cran/latest"
+    },
+    "raster": {
+      "Package": "raster",
+      "Version": "3.6-32",
+      "Source": "Repository",
+      "Type": "Package",
+      "Title": "Geographic Data Analysis and Modeling",
+      "Date": "2025-03-27",
+      "Imports": [
+        "Rcpp",
+        "methods",
+        "terra (>= 1.8-5)"
+      ],
+      "LinkingTo": [
+        "Rcpp"
+      ],
+      "Depends": [
+        "sp (>= 1.4-5)",
+        "R (>= 3.5.0)"
+      ],
+      "Suggests": [
+        "ncdf4",
+        "igraph",
+        "tcltk",
+        "parallel",
+        "rasterVis",
+        "MASS",
+        "sf",
+        "tinytest",
+        "gstat",
+        "fields",
+        "exactextractr"
+      ],
+      "Description": "Reading, writing, manipulating, analyzing and modeling of spatial data. This package has been superseded by the \"terra\" package <https://CRAN.R-project.org/package=terra>.",
+      "License": "GPL (>= 3)",
+      "URL": "https://rspatial.org/raster",
+      "BugReports": "https://github.com/rspatial/raster/issues/",
+      "Authors@R": "c( person(\"Robert J.\", \"Hijmans\", role = c(\"cre\", \"aut\"),   email = \"r.hijmans@gmail.com\",  comment = c(ORCID = \"0000-0001-5872-2872\")), person(\"Jacob\", \"van Etten\", role = \"ctb\"), person(\"Michael\", \"Sumner\", role = \"ctb\"), person(\"Joe\", \"Cheng\", role = \"ctb\"), person(\"Dan\", \"Baston\", role = \"ctb\"), person(\"Andrew\", \"Bevan\", role = \"ctb\"), person(\"Roger\", \"Bivand\", role = \"ctb\"), person(\"Lorenzo\", \"Busetto\", role = \"ctb\"), person(\"Mort\", \"Canty\", role = \"ctb\"), person(\"Ben\", \"Fasoli\", role = \"ctb\"), person(\"David\", \"Forrest\", role = \"ctb\"), person(\"Aniruddha\", \"Ghosh\", role = \"ctb\"), person(\"Duncan\", \"Golicher\", role = \"ctb\"), person(\"Josh\", \"Gray\", role = \"ctb\"), person(\"Jonathan A.\", \"Greenberg\", role = \"ctb\"), person(\"Paul\", \"Hiemstra\", role = \"ctb\"), person(\"Kassel\", \"Hingee\", role = \"ctb\"), person(\"Alex\", \"Ilich\", role = \"ctb\"), person(\"Institute for Mathematics Applied Geosciences\", role=\"cph\"), person(\"Charles\", \"Karney\", role = \"ctb\"), person(\"Matteo\", \"Mattiuzzi\", role = \"ctb\"), person(\"Steven\", \"Mosher\", role = \"ctb\"), person(\"Babak\", \"Naimi\", role = \"ctb\"),\t person(\"Jakub\", \"Nowosad\", role = \"ctb\"), person(\"Edzer\", \"Pebesma\", role = \"ctb\"), person(\"Oscar\", \"Perpinan Lamigueiro\", role = \"ctb\"), person(\"Etienne B.\", \"Racine\", role = \"ctb\"), person(\"Barry\", \"Rowlingson\", role = \"ctb\"), person(\"Ashton\", \"Shortridge\", role = \"ctb\"), person(\"Bill\", \"Venables\", role = \"ctb\"), person(\"Rafael\", \"Wueest\", role = \"ctb\") )",
+      "NeedsCompilation": "yes",
+      "Author": "Robert J. Hijmans [cre, aut] (<https://orcid.org/0000-0001-5872-2872>), Jacob van Etten [ctb], Michael Sumner [ctb], Joe Cheng [ctb], Dan Baston [ctb], Andrew Bevan [ctb], Roger Bivand [ctb], Lorenzo Busetto [ctb], Mort Canty [ctb], Ben Fasoli [ctb], David Forrest [ctb], Aniruddha Ghosh [ctb], Duncan Golicher [ctb], Josh Gray [ctb], Jonathan A. Greenberg [ctb], Paul Hiemstra [ctb], Kassel Hingee [ctb], Alex Ilich [ctb], Institute for Mathematics Applied Geosciences [cph], Charles Karney [ctb], Matteo Mattiuzzi [ctb], Steven Mosher [ctb], Babak Naimi [ctb], Jakub Nowosad [ctb], Edzer Pebesma [ctb], Oscar Perpinan Lamigueiro [ctb], Etienne B. Racine [ctb], Barry Rowlingson [ctb], Ashton Shortridge [ctb], Bill Venables [ctb], Rafael Wueest [ctb]",
+      "Maintainer": "Robert J. Hijmans <r.hijmans@gmail.com>",
+      "Repository": "CRAN"
     },
     "rcmdcheck": {
       "Package": "rcmdcheck",
@@ -5020,6 +5115,39 @@
       "Maintainer": "Winston Chang <winston@posit.co>",
       "Repository": "https://packagemanager.posit.co/cran/latest"
     },
+    "slippymath": {
+      "Package": "slippymath",
+      "Version": "0.3.1",
+      "Source": "Repository",
+      "Title": "Slippy Map Tile Tools",
+      "Authors@R": "c( person(\"Miles\", \"McBain\", email = \"miles.mcbain@gmail.com\", role = c(\"aut\", \"cre\"),  comment = c(ORCID = \"0000-0003-2865-2548\")), person(\"Michael\",\"Sumner\", email = \"mdsumner@gmail.com\", role = c(\"aut\")))",
+      "Description": "Provides functions for performing common tasks when working with slippy map tile service APIs e.g. Google maps, Open Street Map, Mapbox, Stamen, among others. Functionality includes converting from latitude and longitude to tile numbers, determining tile bounding boxes, and compositing tiles to a georeferenced raster image.",
+      "Depends": [
+        "R (>= 3.5.0)"
+      ],
+      "License": "MIT + file LICENSE",
+      "URL": "https://www.github.com/milesmcbain/slippymath",
+      "BugReports": "https://www.github.com/milesmcbain/slippymath/issues",
+      "Encoding": "UTF-8",
+      "LazyData": "true",
+      "Imports": [
+        "raster",
+        "purrr",
+        "stats",
+        "png"
+      ],
+      "Suggests": [
+        "testthat",
+        "knitr",
+        "rmarkdown"
+      ],
+      "RoxygenNote": "6.1.1",
+      "VignetteBuilder": "knitr",
+      "NeedsCompilation": "no",
+      "Author": "Miles McBain [aut, cre] (<https://orcid.org/0000-0003-2865-2548>), Michael Sumner [aut]",
+      "Maintainer": "Miles McBain <miles.mcbain@gmail.com>",
+      "Repository": "CRAN"
+    },
     "snakecase": {
       "Package": "snakecase",
       "Version": "0.11.1",
@@ -5728,6 +5856,58 @@
       "NeedsCompilation": "yes",
       "Author": "Lionel Henry [aut, cre], Hadley Wickham [aut], Posit Software, PBC [cph, fnd]",
       "Maintainer": "Lionel Henry <lionel@posit.co>",
+      "Repository": "CRAN"
+    },
+    "tidyterra": {
+      "Package": "tidyterra",
+      "Version": "0.7.2",
+      "Source": "Repository",
+      "Title": "'tidyverse' Methods and 'ggplot2' Helpers for 'terra' Objects",
+      "Authors@R": "c( person(\"Diego\", \"Hernangómez\", , \"diego.hernangomezherrero@gmail.com\", role = c(\"aut\", \"cre\", \"cph\"), comment = c(ORCID = \"0000-0001-8457-4658\")), person(\"Dewey\", \"Dunnington\", role = \"ctb\", comment = c(ORCID = \"0000-0002-9415-4582\", \"for ggspatial code\")), person(\"ggplot2 authors\", role = \"cph\", comment = \"for contour code\"), person(\"Andrea\", \"Manica\", role = \"ctb\") )",
+      "Description": "Extension of the 'tidyverse' for 'SpatRaster' and 'SpatVector' objects of the 'terra' package. It includes also new 'geom_' functions that provide a convenient way of visualizing 'terra' objects with 'ggplot2'.",
+      "License": "MIT + file LICENSE",
+      "URL": "https://dieghernan.github.io/tidyterra/, https://github.com/dieghernan/tidyterra",
+      "BugReports": "https://github.com/dieghernan/tidyterra/issues",
+      "Depends": [
+        "R (>= 3.6.0)"
+      ],
+      "Imports": [
+        "cli (>= 3.0.0)",
+        "data.table",
+        "dplyr (>= 1.0.0)",
+        "ggplot2 (>= 3.5.0)",
+        "magrittr",
+        "rlang",
+        "scales",
+        "sf (>= 1.0.0)",
+        "terra (>= 1.8-10)",
+        "tibble (>= 3.0.0)",
+        "tidyr (>= 1.0.0)"
+      ],
+      "Suggests": [
+        "hexbin",
+        "isoband",
+        "knitr",
+        "lifecycle",
+        "maptiles",
+        "rmarkdown",
+        "s2",
+        "testthat (>= 3.0.0)",
+        "vctrs",
+        "vdiffr"
+      ],
+      "VignetteBuilder": "knitr",
+      "Config/Needs/coverage": "covr",
+      "Config/Needs/website": "geodata, dieghernan/gitdevr, ragg, styler, metR, ggspatial, cpp11, remotes, gganimate, gifski",
+      "Config/testthat/edition": "3",
+      "Config/testthat/parallel": "false",
+      "Encoding": "UTF-8",
+      "LazyData": "true",
+      "RoxygenNote": "7.3.2",
+      "X-schema.org-keywords": "r, terra, ggplot-extension, r-spatial, rspatial, cran, cran-r, r-package, rstats, rstats-package",
+      "NeedsCompilation": "no",
+      "Author": "Diego Hernangómez [aut, cre, cph] (<https://orcid.org/0000-0001-8457-4658>), Dewey Dunnington [ctb] (<https://orcid.org/0000-0002-9415-4582>, for ggspatial code), ggplot2 authors [cph] (for contour code), Andrea Manica [ctb]",
+      "Maintainer": "Diego Hernangómez <diego.hernangomezherrero@gmail.com>",
       "Repository": "CRAN"
     },
     "timechange": {
