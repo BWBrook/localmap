@@ -18,8 +18,9 @@ Key targets:
 - `species_occurrences`: Downloads occurrence records for each resolved species
   and returns a tidy tibble with metadata (honouring configuration for minimum
   year, state province, latitude threshold, and optional boundary geometry).
-- `species_map`: Produces a static map image using the configured bounding box
-  to visualise the occurrence points by species.
+- `species_map`: Produces a static map image using the configured bounding box,
+  overlays the species occurrences, and can render supplementary point layers
+  supplied via CSV (see `data$occurrence$map$additional_points`).
 - `cfg`: Loads configuration from `config/config.yaml`; ensure the ALA section
   defines a valid email and `download_reason_id`.
 - `raw_manifest`: Reads `metadata/data_manifest.csv` to enumerate input files.

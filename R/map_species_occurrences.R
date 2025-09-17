@@ -7,8 +7,10 @@
 #'
 #' @param occurrences Tibble or data frame of occurrence records containing at
 #'   least `longitude`, `latitude`, and `species_id` columns.
-#' @param mapping_settings Optional list with `bounding_box`, `basemap`, and
-#'   `output_path` entries, typically sourced from `config/config.yaml`.
+#' @param mapping_settings Optional list with entries such as `bounding_box`,
+#'   `basemap`, `output_path`, appearance toggles (`show_title`, `show_legend`),
+#'   point styling, and an optional `additional_points` list containing `path`,
+#'   `colour`, and `size`. Typically sourced from `config/config.yaml`.
 #' @param output_path Optional override for the output image path. When `NULL`,
 #'   the value from `mapping_settings$output_path` is used; if that is also
 #'   missing, defaults to `here::here("outputs", "maps",
@@ -23,7 +25,9 @@ map_species_occurrences <- function(occurrences,
   import::from("dplyr", mutate, coalesce, .into = fn_env)
   import::from("geosphere", destPoint, .into = fn_env)
   import::from("ggplot2", coord_sf, geom_sf, ggplot, ggsave, labs, theme, theme_minimal, .into = fn_env)
+  import::from("here", here, .into = fn_env)
   import::from("rnaturalearth", ne_states, .into = fn_env)
+  import::from("readr", read_csv, .into = fn_env)
   import::from("rlang", abort, warn, .into = fn_env)
   import::from("sf", st_as_sf, st_bbox, st_crop, st_make_valid, st_polygon, st_sfc, st_within, st_filter, .into = fn_env)
   import::from("utils", modifyList, .into = fn_env)
@@ -35,12 +39,26 @@ map_species_occurrences <- function(occurrences,
     show_title = FALSE,
     show_legend = FALSE,
     point_colour = "#2ca25f",
-    point_size = 1.6
+    point_size = 1.6,
+    additional_points = list(
+      path = NULL,
+      colour = "#d73027",
+      size = NULL
+    )
   )
   mapping_settings <- modifyList(defaults, mapping_settings)
 
   assert_numeric(mapping_settings$point_size, len = 1L, lower = 0)
   assert_string(mapping_settings$point_colour, min.chars = 1L)
+
+  additional_cfg <- mapping_settings$additional_points
+  if (!is.null(additional_cfg$colour)) {
+    assert_string(additional_cfg$colour, min.chars = 1L)
+  }
+  if (!is.null(additional_cfg$size)) {
+    assert_numeric(additional_cfg$size, len = 1L, lower = 0)
+  }
+  additional_points_sf <- load_additional_points(additional_cfg)
 
   bbox_cfg <- mapping_settings$bounding_box
   if (is.null(bbox_cfg)) {
@@ -140,6 +158,20 @@ map_species_occurrences <- function(occurrences,
       )
   }
 
+  if (!is.null(additional_points_sf) && nrow(additional_points_sf) > 0L) {
+    extra_size <- additional_cfg$size
+    if (is.null(extra_size)) {
+      extra_size <- mapping_settings$point_size
+    }
+    plot_obj <- plot_obj +
+      geom_sf(
+        data = additional_points_sf,
+        colour = additional_cfg$colour,
+        alpha = 0.9,
+        size = extra_size
+      )
+  }
+
   plot_obj <- plot_obj +
     coord_sf(
       xlim = c(bbox_bb["xmin"], bbox_bb["xmax"]),
@@ -196,6 +228,52 @@ coerce_top_left <- function(value) {
   }
   assert_numeric(coords, len = 2L, any.missing = FALSE)
   c(lat = coords[[1]], lon = coords[[2]])
+}
+
+load_additional_points <- function(cfg) {
+  fn_env <- environment()
+  import::from("checkmate", assert_list, assert_character, assert_string, .into = fn_env)
+  import::from("here", here, .into = fn_env)
+  import::from("readr", read_csv, .into = fn_env)
+  import::from("rlang", warn, .into = fn_env)
+  import::from("sf", st_as_sf, .into = fn_env)
+
+  if (is.null(cfg) || (!is.list(cfg))) {
+    return(NULL)
+  }
+
+  path <- cfg$path
+  if (is.null(path) || !is.character(path) || length(path) != 1L) {
+    return(NULL)
+  }
+
+  candidate_paths <- unique(c(path, here(path)))
+  resolved <- candidate_paths[file.exists(candidate_paths)][1]
+  if (is.na(resolved)) {
+    warn(sprintf("Additional points file not found: %s", path))
+    return(NULL)
+  }
+
+  data <- try(read_csv(resolved, show_col_types = FALSE, progress = FALSE), silent = TRUE)
+  if (inherits(data, "try-error")) {
+    warn(sprintf("Failed to read additional points file: %s", resolved))
+    return(NULL)
+  }
+
+  required <- c("lat", "lon")
+  missing <- setdiff(required, names(data))
+  if (length(missing) > 0L) {
+    warn(sprintf("Additional points file missing columns: %s", paste(missing, collapse = ", ")))
+    return(NULL)
+  }
+
+  data <- data[!is.na(data$lat) & !is.na(data$lon), , drop = FALSE]
+  if (nrow(data) == 0L) {
+    warn("Additional points file contains no valid lat/lon rows.")
+    return(NULL)
+  }
+
+  st_as_sf(data, coords = c("lon", "lat"), crs = 4326, remove = FALSE)
 }
 
 build_square_bbox <- function(top_left, side_length_km) {

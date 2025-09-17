@@ -86,6 +86,9 @@ data:
       show_legend: false
       point_colour: "#2ca25f"
       point_size: 1.6
+      additional_points:
+        path: data/raw/lyr_pt.csv
+        colour: "#d73027"
       bounding_box:
         top_left:
           lat: -40.2
@@ -96,3 +99,6 @@ data:
 
 The bounding box approach ensures the map covers Tasmania for the current
 lyrebird case study while remaining configurable for future species.
+Provide optional ancillary locations via `additional_points`; they should
+include `lat`/`lon` columns in the referenced CSV and will render in the
+configured colour (default red).

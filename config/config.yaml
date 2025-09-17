@@ -25,6 +25,9 @@ default:
         show_legend: false
         point_colour: "#2ca25f"
         point_size: 1.6
+        additional_points:
+          path: "data/raw/lyr_pt.csv"
+          colour: "#d73027"
         bounding_box:
           top_left:
             lat: -40.2

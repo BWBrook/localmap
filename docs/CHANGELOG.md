@@ -23,6 +23,8 @@ The format follows Keep a Changelog. This project adheres to Semantic Versioning
   bounding-box constrained image.
 - Configuration entries for mapping (bounding box, basemap, output path) under
   `data$occurrence$map`.
+- Optional ancillary point overlays drawn from CSV files (configured under
+  `data$occurrence$map$additional_points`).
 
 ### Changed
 - Rename project metadata, Quarto site, and pkgdown home content from `rcompendium`
