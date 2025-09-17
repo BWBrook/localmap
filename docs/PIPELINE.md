@@ -29,6 +29,8 @@ Key targets:
 - `combined_data`: Combined tibble across CSV inputs (common columns only).
 - `manifest_summary`: Minimal summary of the manifest (counts and distinct files).
 - `report`: Renders `reports/paper.qmd` to HTML.
+- `topo_tile_map`: Renders a tile-based occurrence map (OpenTopoMap by default)
+  using slippy tiles with optional ancillary points.
 
 To run locally (in RStudio Console):
 

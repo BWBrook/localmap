@@ -53,6 +53,9 @@ Key targets available out of the box:
 - `species_occurrences`: occurrence records retrieved via galah
 - `species_map`: static map image highlighting occurrence points within the
   configured bounding box
+- `topo_tile_map`: tile-based map (defaults to `Esri.WorldImagery`, with
+  alternatives like `OpenTopoMap`) overlaying species
+  and ancillary points for the configured extent
 - `cfg`: configuration list
 - `raw_manifest`: parsed input manifest
 - `input_files`: file paths tracked as dependencies (format = "file")
@@ -84,11 +87,18 @@ data:
       basemap: rnaturalearth
       show_title: false
       show_legend: false
-      point_colour: "#2ca25f"
+      point_colour: "#2171b5"
       point_size: 1.6
       additional_points:
         path: data/raw/lyr_pt.csv
         colour: "#d73027"
+        size: null
+      # Tile-based target options
+      tile_provider: Esri.WorldImagery  # alternatives include OpenTopoMap
+      tile_zoom: 8
+      tile_outline_colour: "#ffffff"
+      tile_graticule: false
+      topo_output_path: outputs/maps/species_topo.png
       bounding_box:
         top_left:
           lat: -40.2
@@ -98,7 +108,12 @@ data:
 ```
 
 The bounding box approach ensures the map covers Tasmania for the current
-lyrebird case study while remaining configurable for future species.
-Provide optional ancillary locations via `additional_points`; they should
-include `lat`/`lon` columns in the referenced CSV and will render in the
-configured colour (default red).
+lyrebird case study while remaining configurable for future species. Provide
+optional ancillary locations via `additional_points`; they should include
+`lat`/`lon` columns in the referenced CSV and will render in the configured
+colour (default red). Tile-based backgrounds for the `topo_tile_map` target can
+be adjusted via `tile_provider` (e.g., `Esri.WorldImagery`, `OpenTopoMap`),
+`tile_zoom`, `tile_outline_colour`, and `tile_graticule` (adds labelled degree
+graticules). The rendered file defaults to `outputs/maps/species_topo.png` but
+can be overridden with
+`topo_output_path`.

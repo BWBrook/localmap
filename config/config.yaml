@@ -23,11 +23,17 @@ default:
         basemap: "rnaturalearth"
         show_title: false
         show_legend: false
-        point_colour: "#2ca25f"
+        point_colour: "#2171b5"
         point_size: 1.6
         additional_points:
           path: "data/raw/lyr_pt.csv"
           colour: "#d73027"
+          size: null
+        tile_provider: "Esri.WorldImagery"
+        tile_zoom: 8
+        tile_outline_colour: "#ffffff"
+        tile_graticule: true
+        topo_output_path: "outputs/maps/species_topo.png"
         bounding_box:
           top_left:
             lat: -40.2

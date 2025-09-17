@@ -25,6 +25,11 @@ The format follows Keep a Changelog. This project adheres to Semantic Versioning
   `data$occurrence$map`.
 - Optional ancillary point overlays drawn from CSV files (configured under
   `data$occurrence$map$additional_points`).
+- Added `topo_tile_map` target to render OpenTopoMap-based tile imagery (or
+  other providers) beneath species and ancillary points.
+- Tile maps now support optional latitude/longitude graticule overlays with
+  labelled degrees and default to blue occurrence markers for better contrast
+  on satellite imagery.
 
 ### Changed
 - Rename project metadata, Quarto site, and pkgdown home content from `rcompendium`

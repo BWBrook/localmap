@@ -65,6 +65,16 @@ list(
     description = "Static map visualising species occurrences within the configured bounding box."
   ),
 
+  targets::tar_target(
+    topo_tile_map,
+    generate_topo_tile_map(
+      occurrences = species_occurrences,
+      mapping_settings = cfg$data$occurrence$map
+    ),
+    format = "file",
+    description = "Tile-based occurrence map using slippy tiles (OpenTopoMap by default)."
+  ),
+
   # Manifest of input files
   targets::tar_target(
     raw_manifest,

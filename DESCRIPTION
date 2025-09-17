@@ -36,8 +36,10 @@ Imports:
     sf,
     ggplot2,
     geosphere,
+    maptiles,
     rnaturalearth,
-    rnaturalearthdata
+    rnaturalearthdata,
+    tidyterra
 Suggests:
     testthat,
     lintr,

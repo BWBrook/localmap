@@ -15,7 +15,7 @@ project_dependencies <- function() {
     # parallel & progress & logging
     "future", "future.batchtools", "pbmcapply", "progressr", "lgr",
     # viz
-    "ggplot2", "RColorBrewer", "zoo", "patchwork",
+    "ggplot2", "RColorBrewer", "zoo", "patchwork", "maptiles", "tidyterra",
     # ergonomics & errors
     "cli", "rlang", "import",
     # dev
