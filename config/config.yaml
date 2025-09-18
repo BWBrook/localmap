@@ -59,14 +59,15 @@ default:
         width: 2048
         height: 2048
         dpi: 96
+        legend_path: "outputs/tiles/tasveg_camera_sites_legend.png"
         output_path: "outputs/tiles/tasveg_camera_sites.png"
       map:
         output_path: "outputs/maps/camera_sites.png"
-        scale_bar_location: "bl"
+        scale_bar_location: "tl"
         north_arrow_location: "tr"
-        point_size_min: 2.0
-        point_size_max: 8.0
-        zero_obs_colour: "#cccccc"
+        point_size_min: 1.0
+        point_size_max: 5.0
+        zero_obs_colour: "#050505"
         positive_obs_colour: "#d73027"
 
   ala:

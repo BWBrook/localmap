@@ -63,10 +63,11 @@ read_camera_sites <- function(path) {
 #'   and EPSG:3857.
 prepare_camera_site_context <- function(sites,
                                         central_site,
-                                        half_width_km) {
+                                        half_width_km,
+                                        basemap_cfg = NULL) {
   fn_env <- environment()
   import::from("checkmate", assert_data_frame, assert_numeric, assert_string, .into = fn_env)
-  import::from("rlang", abort, .into = fn_env)
+  import::from("rlang", abort, warn, .into = fn_env)
   import::from("sf", st_as_sf, st_bbox, st_coordinates, st_crs, st_point, st_polygon, st_sfc, st_transform, st_within, .into = fn_env)
 
   assert_data_frame(sites, min.rows = 1L)
@@ -87,7 +88,29 @@ prepare_camera_site_context <- function(sites,
   centre_point <- st_sfc(st_point(c(centre_row$lon, centre_row$lat)), crs = 4326)
   centre_3857 <- st_transform(centre_point, 3857)
   coords_3857 <- as.numeric(st_coordinates(centre_3857))
-  half_m <- half_width_km * 1000
+
+  effective_half_km <- as.numeric(half_width_km)
+  clamp_note <- NULL
+  if (!is.null(basemap_cfg)) {
+    width_px <- camera_sites_default(basemap_cfg$width, 2048)
+    dpi <- camera_sites_default(basemap_cfg$dpi, 96)
+    max_scale <- basemap_cfg$max_scale
+    if (is.null(max_scale)) {
+      max_scale <- NA_real_
+    }
+    if (is.finite(width_px) && width_px > 0 && is.finite(dpi) && dpi > 0 && isTRUE(!is.na(max_scale)) && max_scale > 0) {
+      max_total_width_m <- (as.numeric(width_px) * as.numeric(max_scale) * 0.0254) / as.numeric(dpi)
+      allowed_half_km <- max_total_width_m / 2 / 1000
+      if (is.finite(allowed_half_km) && allowed_half_km > 0 && effective_half_km > allowed_half_km) {
+        clamp_note <- sprintf("Requested half-width %.1f km exceeds max-scale allowance %.1f km; clamping.", effective_half_km, allowed_half_km)
+        effective_half_km <- allowed_half_km
+      }
+    }
+  }
+  if (!is.null(clamp_note)) {
+    warn(clamp_note)
+  }
+  half_m <- effective_half_km * 1000
 
   square_coords <- matrix(
     c(
@@ -118,7 +141,9 @@ prepare_camera_site_context <- function(sites,
     bbox_4326 = bbox_4326,
     bbox_3857 = bbox_3857,
     centre_row = centre_row,
-    centre_point_4326 = centre_point
+    centre_point_4326 = centre_point,
+    half_width_km = effective_half_km,
+    basemap_cfg = if (is.null(basemap_cfg)) list() else basemap_cfg
   )
 }
 
@@ -260,13 +285,90 @@ fetch_camera_wms_tile <- function(bbox_3857,
 #' @param tile_path Optional path to a background tile image.
 #' @param map_cfg List of display options (colours, output path, etc.).
 #' @return Path to the rendered PNG file.
+
+
+camera_sites_fetch_legend <- function(basemap_cfg, legend_cfg) {
+  fn_env <- environment()
+  import::from("checkmate", assert_list, assert_string, .into = fn_env)
+  import::from("here", here, .into = fn_env)
+  import::from("httr2", request, req_url_query, req_perform, resp_body_raw, resp_check_status, .into = fn_env)
+  import::from("rlang", warn, .into = fn_env)
+
+  if (is.null(legend_cfg) || !isTRUE(legend_cfg$show)) {
+    return(NULL)
+  }
+  if (is.null(basemap_cfg)) {
+    warn("Legend requested but basemap configuration missing; skipping legend fetch.")
+    return(NULL)
+  }
+  url <- basemap_cfg$url
+  layers <- basemap_cfg$layers
+  if (is.null(url) || !nzchar(url) || is.null(layers) || length(layers) == 0L) {
+    warn("Legend requested but WMS URL or layer not supplied; skipping legend fetch.")
+    return(NULL)
+  }
+  layer <- trimws(as.character(layers[[1]]))
+  if (!nzchar(layer)) {
+    warn("Legend requested but first WMS layer is empty; skipping legend fetch.")
+    return(NULL)
+  }
+  path <- basemap_cfg$legend_path
+  if (is.null(path) || !nzchar(path)) {
+    path <- here("outputs", "tiles", "camera_sites_legend.png")
+  }
+  dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
+
+  version <- camera_sites_default(basemap_cfg$version, "1.3.0")
+  format <- camera_sites_default(legend_cfg$format, "image/png")
+  styles <- camera_sites_default(basemap_cfg$styles, "")
+  width <- legend_cfg$graphic_width
+  height <- legend_cfg$graphic_height
+
+  query <- list(
+    service = "WMS",
+    request = "GetLegendGraphic",
+    version = version,
+    layer = layer,
+    format = format
+  )
+  if (!is.null(styles) && nzchar(styles)) {
+    query$style <- styles
+  }
+  if (!is.null(width) && is.finite(width)) {
+    query$width <- as.integer(width)
+  }
+  if (!is.null(height) && is.finite(height)) {
+    query$height <- as.integer(height)
+  }
+
+  resp <- try(req_url_query(request(url), !!!query) |> req_perform(), silent = TRUE)
+  if (inherits(resp, "try-error")) {
+    warn("Failed to fetch WMS legend; legend will be omitted.")
+    return(NULL)
+  }
+  resp_check_status(resp)
+  body <- resp_body_raw(resp)
+  if (length(body) == 0L) {
+    warn("Empty WMS legend response; legend will be omitted.")
+    return(NULL)
+  }
+  png_signature <- as.raw(c(0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A))
+  is_png <- length(body) >= length(png_signature) && identical(body[seq_along(png_signature)], png_signature)
+  if (!is_png) {
+    warn("Legend response was not a PNG; legend will be omitted.")
+    return(NULL)
+  }
+  writeBin(body, path)
+  path
+}
 render_camera_sites_map <- function(context,
                                     tile_path = NULL,
                                     map_cfg = NULL) {
   fn_env <- environment()
   import::from("checkmate", assert_list, .into = fn_env)
-  import::from("ggplot2", annotation_raster, coord_sf, geom_sf, ggplot, ggsave, scale_colour_identity, scale_fill_identity, scale_size_identity, theme_void, .into = fn_env)
+  import::from("ggplot2", annotation_raster, coord_sf, geom_sf, geom_sf_text, ggplot, ggsave, scale_colour_identity, scale_fill_identity, scale_size_identity, theme_void, .into = fn_env)
   import::from("ggspatial", annotation_north_arrow, annotation_scale, north_arrow_orienteering, .into = fn_env)
+  import::from("grid", rasterGrob, .into = fn_env)
   import::from("here", here, .into = fn_env)
   import::from("png", readPNG, .into = fn_env)
   import::from("rlang", warn, .into = fn_env)
@@ -277,14 +379,34 @@ render_camera_sites_map <- function(context,
 
   defaults <- list(
     output_path = here("outputs", "maps", "camera_sites.png"),
-    scale_bar_location = "bl",
+    scale_bar_location = "tl",
     north_arrow_location = "tr",
     point_size_min = 2,
     point_size_max = 8,
     zero_obs_colour = "#cccccc",
-    positive_obs_colour = "#d73027"
+    positive_obs_colour = "#d73027",
+    show_graticule = TRUE,
+    graticule_colour = "#050505",
+    graticule_alpha = 0.4,
+    graticule_label_size = 3,
+    legend = list(
+      show = TRUE,
+      position = "right",
+      layout = "overlay",
+      width_fraction = 0.2,
+      margin_fraction = 0.05,
+      format = "image/png",
+      graphic_width = NULL,
+      graphic_height = NULL
+    )
   )
   map_cfg <- modifyList(defaults, camera_sites_default(map_cfg, list()))
+  legend_cfg <- camera_sites_default(map_cfg$legend, list())
+  legend_cfg$show <- isTRUE(camera_sites_default(legend_cfg$show, FALSE))
+  legend_cfg$layout <- camera_sites_default(legend_cfg$layout, "overlay")
+  legend_cfg$position <- camera_sites_default(legend_cfg$position, "right")
+  legend_cfg$width_fraction <- as.numeric(camera_sites_default(legend_cfg$width_fraction, 0.2))
+  legend_cfg$margin_fraction <- as.numeric(camera_sites_default(legend_cfg$margin_fraction, 0.05))
 
   bbox <- st_bbox(context$bbox_3857)
   within <- context$within
@@ -302,6 +424,22 @@ render_camera_sites_map <- function(context,
     scaled[is.na(scaled)] <- 0
     range_span <- map_cfg$point_size_max - map_cfg$point_size_min
     point_sizes <- map_cfg$point_size_min + (scaled * range_span)
+  }
+
+  legend_path <- NULL
+  legend_grob <- NULL
+  legend_dims <- NULL
+  if (isTRUE(legend_cfg$show)) {
+    legend_path <- camera_sites_fetch_legend(context$basemap_cfg, legend_cfg)
+    if (!is.null(legend_path) && file.exists(legend_path)) {
+      legend_img <- try(readPNG(legend_path), silent = TRUE)
+      if (!inherits(legend_img, "try-error")) {
+        legend_grob <- rasterGrob(legend_img, interpolate = TRUE)
+        legend_dims <- dim(legend_img)
+      } else {
+        warn(sprintf("Failed to read legend image: %s", legend_path))
+      }
+    }
   }
 
   plot_obj <- ggplot()
@@ -323,6 +461,31 @@ render_camera_sites_map <- function(context,
     }
   }
 
+  if (isTRUE(map_cfg$show_graticule)) {
+    grid <- camera_sites_create_graticule(context$bbox_4326)
+    if (!is.null(grid$lines) && nrow(grid$lines) > 0L) {
+      plot_obj <- plot_obj +
+        geom_sf(
+          data = grid$lines,
+          colour = map_cfg$graticule_colour,
+          alpha = map_cfg$graticule_alpha,
+          linewidth = 0.2,
+          inherit.aes = FALSE
+        )
+    }
+    if (!is.null(grid$labels) && nrow(grid$labels) > 0L) {
+      plot_obj <- plot_obj +
+        geom_sf_text(
+          data = grid$labels,
+          ggplot2::aes(label = label),
+          colour = map_cfg$graticule_colour,
+          alpha = map_cfg$graticule_alpha,
+          size = map_cfg$graticule_label_size,
+          check_overlap = TRUE
+        )
+    }
+  }
+
   if (nrow(within) > 0L) {
     within$colour <- ifelse(within$obs > 0, map_cfg$positive_obs_colour, map_cfg$zero_obs_colour)
     within$size <- point_sizes
@@ -338,14 +501,70 @@ render_camera_sites_map <- function(context,
       scale_size_identity()
   }
 
+  coord_xlim_max <- bbox["xmax"]
+  coord_ylim_min <- bbox["ymin"]
+  coord_ylim_max <- bbox["ymax"]
+  bbox_width <- bbox["xmax"] - bbox["xmin"]
+  bbox_height <- bbox["ymax"] - bbox["ymin"]
+  legend_xmin <- legend_xmax <- legend_ymin <- legend_ymax <- NA_real_
+  if (!is.null(legend_grob) && identical(legend_cfg$position, "right")) {
+    width_frac <- legend_cfg$width_fraction
+    margin_frac <- legend_cfg$margin_fraction
+    if (!is.finite(width_frac) || width_frac <= 0) width_frac <- 0.2
+    if (!is.finite(margin_frac) || margin_frac < 0) margin_frac <- 0.05
+    if (identical(legend_cfg$layout, "sidebar")) {
+      legend_width <- bbox_width * width_frac
+      legend_margin <- bbox_width * margin_frac
+      coord_xlim_max <- bbox["xmax"] + legend_margin + legend_width
+      legend_xmin <- bbox["xmax"] + legend_margin
+      legend_xmax <- legend_xmin + legend_width
+      legend_ymin <- bbox["ymin"] + bbox_height * margin_frac
+      legend_ymax <- bbox["ymax"] - bbox_height * margin_frac
+    } else {
+      legend_width <- bbox_width * width_frac
+      legend_height <- legend_width
+      if (!is.null(legend_dims) && length(legend_dims) >= 2 && legend_dims[[2]] > 0) {
+        aspect <- legend_dims[[1]] / legend_dims[[2]]
+        legend_height <- legend_width * aspect
+      }
+      legend_margin <- bbox_width * margin_frac
+      coord_xlim_max <- bbox["xmax"]
+      legend_xmax <- bbox["xmax"] - legend_margin
+      legend_xmin <- legend_xmax - legend_width
+      legend_ymax <- bbox["ymax"] - bbox_height * margin_frac
+      legend_ymin <- legend_ymax - legend_height
+      min_y <- bbox["ymin"] + bbox_height * margin_frac
+      if (legend_ymin < min_y) {
+        shift <- min_y - legend_ymin
+        legend_ymin <- legend_ymin + shift
+        legend_ymax <- legend_ymax + shift
+      }
+      max_height <- bbox_height * (1 - 2 * margin_frac)
+      if (legend_ymax - legend_ymin > max_height && max_height > 0) {
+        legend_ymin <- legend_ymax - max_height
+      }
+    }
+  }
+
   plot_obj <- plot_obj +
     coord_sf(
       crs = st_crs(3857),
-      xlim = c(bbox["xmin"], bbox["xmax"]),
-      ylim = c(bbox["ymin"], bbox["ymax"]),
+      xlim = c(bbox["xmin"], coord_xlim_max),
+      ylim = c(coord_ylim_min, coord_ylim_max),
       expand = FALSE
     ) +
     theme_void()
+
+  if (!is.null(legend_grob) && !is.na(legend_xmin) && !is.na(legend_xmax)) {
+    plot_obj <- plot_obj +
+      ggplot2::annotation_custom(
+        legend_grob,
+        xmin = legend_xmin,
+        xmax = legend_xmax,
+        ymin = legend_ymin,
+        ymax = legend_ymax
+      )
+  }
 
   plot_obj <- plot_obj +
     annotation_scale(
@@ -364,3 +583,102 @@ render_camera_sites_map <- function(context,
   map_cfg$output_path
 }
 
+
+
+camera_sites_pick_step <- function(range_deg) {
+  steps <- c(0.01, 0.02, 0.05, 0.1, 0.25, 0.5, 1, 2, 5, 10)
+  if (!is.finite(range_deg) || range_deg <= 0) {
+    return(steps[[1]])
+  }
+  for (step in steps) {
+    if ((range_deg / step) <= 8) {
+      return(step)
+    }
+  }
+  tail(steps, 1)
+}
+
+camera_sites_create_graticule <- function(bbox_4326) {
+  fn_env <- environment()
+  import::from("sf", st_as_sf, st_as_sfc, st_bbox, st_graticule, st_intersection, st_make_valid, st_segmentize, st_set_agr, st_sf, st_transform, .into = fn_env)
+
+  if (is.null(bbox_4326)) {
+    return(list(lines = NULL, labels = NULL))
+  }
+  bb <- st_bbox(bbox_4326)
+  lon_range <- bb["xmax"] - bb["xmin"]
+  lat_range <- bb["ymax"] - bb["ymin"]
+  lon_step <- camera_sites_pick_step(lon_range)
+  lat_step <- camera_sites_pick_step(lat_range)
+  lon_seq <- seq(floor(bb["xmin"] / lon_step) * lon_step, ceiling(bb["xmax"] / lon_step) * lon_step, by = lon_step)
+  lat_seq <- seq(floor(bb["ymin"] / lat_step) * lat_step, ceiling(bb["ymax"] / lat_step) * lat_step, by = lat_step)
+  lon_seq <- unique(lon_seq)
+  lat_seq <- unique(lat_seq)
+  if (length(lon_seq) < 2 || length(lat_seq) < 2) {
+    return(list(lines = NULL, labels = NULL))
+  }
+
+  grid <- st_graticule(
+    lon = lon_seq,
+    lat = lat_seq,
+    xlim = c(bb["xmin"], bb["xmax"]),
+    ylim = c(bb["ymin"], bb["ymax"])
+  )
+  grid <- st_segmentize(grid, dfMaxLength = 25 * 1000)
+  grid <- st_make_valid(grid)
+  bbox_sfc <- st_as_sfc(bb)
+  bbox_3857 <- st_transform(bbox_sfc, 3857)
+  grid_3857 <- st_transform(grid, 3857)
+  grid_3857 <- st_intersection(grid_3857, bbox_3857)
+  grid_sf <- st_as_sf(grid_3857)
+  grid_sf$id <- seq_len(nrow(grid_sf))
+  grid_sf <- st_set_agr(grid_sf, "constant")
+  row.names(grid_sf) <- NULL
+  row.names(grid_sf) <- NULL
+
+  format_lon <- function(x) {
+    dir <- ifelse(x >= 0, "E", "W")
+    sprintf("%.2f°%s", abs(x), dir)
+  }
+  format_lat <- function(y) {
+    dir <- ifelse(y >= 0, "N", "S")
+    sprintf("%.2f°%s", abs(y), dir)
+  }
+
+  lon_offset <- lon_range * 0.02
+  lat_offset <- lat_range * 0.02
+  if (!is.finite(lon_offset) || lon_offset <= 0) lon_offset <- 0.02
+  if (!is.finite(lat_offset) || lat_offset <= 0) lat_offset <- 0.02
+
+  lon_labels <- st_as_sf(
+    data.frame(
+      lon = lon_seq,
+      lat = bb["ymin"] + lat_offset,
+      label = format_lon(lon_seq)
+    ),
+    coords = c("lon", "lat"),
+    crs = 4326,
+    remove = FALSE
+  )
+
+  lat_labels <- st_as_sf(
+    data.frame(
+      lon = bb["xmax"] - lon_offset,
+      lat = lat_seq,
+      label = format_lat(lat_seq)
+    ),
+    coords = c("lon", "lat"),
+    crs = 4326,
+    remove = FALSE
+  )
+
+  labels <- rbind(lon_labels, lat_labels)
+  labels <- st_intersection(labels, bbox_sfc)
+  labels_3857 <- st_transform(labels, 3857)
+  labels_3857 <- st_as_sf(labels_3857)
+  labels_3857$id <- seq_len(nrow(labels_3857))
+  labels_3857 <- st_set_agr(labels_3857, "constant")
+  row.names(labels_3857) <- NULL
+
+  list(lines = grid_sf, labels = labels_3857)
+}

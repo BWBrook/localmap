@@ -82,9 +82,35 @@ test_that("render_camera_sites_map writes map output", {
     map_cfg = list(
       output_path = tmp_map,
       scale_bar_location = "bl",
-      north_arrow_location = "tr"
+      north_arrow_location = "tr",
+      legend = list(show = FALSE)
     )
   )
   expect_equal(out, tmp_map)
   expect_true(file.exists(tmp_map))
+})
+
+
+test_that("prepare_camera_site_context clamps to max scale", {
+  data <- tibble::tibble(
+    site = c("centre", "inside"),
+    lat = c(-41.0, -41.05),
+    lon = c(145.0, 145.04),
+    rd = c(100, 50),
+    obs = c(1, 0)
+  )
+  basemap_cfg <- list(width = 1024, dpi = 254, max_scale = 100000)
+  expect_warning(
+    ctx <- prepare_camera_site_context(
+      data,
+      central_site = "centre",
+      half_width_km = 50,
+      basemap_cfg = basemap_cfg
+    ),
+    "clamping"
+  )
+  allowed_half_km <- ((1024 * 100000 * 0.0254) / 254) / 2 / 1000
+  expect_equal(ctx$half_width_km, allowed_half_km)
+  bb <- sf::st_bbox(ctx$bbox_3857)
+  expect_equal(unname(round((bb["xmax"] - bb["xmin"]) / 1000, 3)), unname(round(allowed_half_km * 2, 3)))
 })

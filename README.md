@@ -101,6 +101,16 @@ data:
       output_path: outputs/maps/camera_sites.png
       zero_obs_colour: "#cccccc"
       positive_obs_colour: "#d73027"
+      show_graticule: true
+      graticule_colour: "#050505"
+      graticule_alpha: 0.4
+      graticule_label_size: 3
+      legend:
+        show: true
+        position: right
+        layout: overlay
+        width_fraction: 0.2
+        margin_fraction: 0.05
 ```
 
 The pipeline reads the CSV (`camera_sites_data`), prepares the spatial extent
@@ -108,7 +118,9 @@ The pipeline reads the CSV (`camera_sites_data`), prepares the spatial extent
 and renders the final map (`camera_sites_map`). Update the provider details to
 match your LIST credentials or alternative WMS sources.
 
-LIST TASVEG layers only render up to their published visibility scale (≈1:100k). Configure `max_scale` in `config.yaml` and keep the requested extent, image size, and DPI within that limit (e.g., halve `bbox_half_km`, reduce `dpi`, or increase `width`/`height`). When the limit is exceeded the WMS returns a fully transparent PNG, so the helper now warns if the request is out of range.
+If the requested extent, dpi, and image size exceed the service visibility (≈1:100k for TASVEG), `prepare_camera_site_context()` automatically clamps the half-width to keep the request within range and the map warns when a tile would render empty. Graticule styling is configurable via `show_graticule` and related settings.
+
+LIST TASVEG layers only render up to their published visibility scale (≈1:100k). Configure `max_scale` in `config.yaml` and keep the requested extent, image size, and DPI within that limit (e.g., halve `bbox_half_km`, reduce `dpi`, or increase `width`/`height`). When the limit is exceeded the WMS returns a fully transparent PNG, so the helper now warns if the request is out of range. Legend rendering (via WMS `GetLegendGraphic`) is on by default—set `map$legend$show = FALSE` to suppress it, or adjust `legend$layout` (`overlay` vs `sidebar`) and the width/margin fractions to control placement.
 
 ## Species occurrence retrieval
 

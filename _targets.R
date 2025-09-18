@@ -91,7 +91,8 @@ list(
     prepare_camera_site_context(
       sites = camera_sites_data,
       central_site = cfg$data$camera_sites$central_site,
-      half_width_km = cfg$data$camera_sites$bbox_half_km
+      half_width_km = cfg$data$camera_sites$bbox_half_km,
+      basemap_cfg = cfg$data$camera_sites$basemap
     ),
     description = "Prepared spatial context (bounding box, filtered sites) for mapping camera deployments."
   ),

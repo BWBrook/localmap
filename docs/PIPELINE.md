@@ -37,13 +37,14 @@ Key targets:
 - `camera_sites_data`: Reads the wildlife camera effort/observation table defined in
   `config$data$camera_sites$path`.
 - `camera_sites_context`: Computes the square bounding box around the configured
-  central site and filters camera deployments that fall within the extent.
+  central site, automatically clamps the half-width to `data$camera_sites$basemap$max_scale`,
+  and filters camera deployments in-range.
 - `camera_sites_tile`: Downloads (or places a placeholder for) a WMS basemap tile
   from the configured provider (e.g., LIST TASVEG).
   The helper checks the requested scale against `max_scale` (default 1:100k for LIST) and warns if the tile would render empty.
 - `camera_sites_map`: Renders an effort-scaled map with red markers for sites
   detecting the focal species and grey markers for zero detections, including
-  scale bar and north arrow.
+  scale bar, north arrow, optional graticules, and an optional WMS legend inset.
 
 To run locally (in RStudio Console):
 
