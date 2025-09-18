@@ -6,6 +6,11 @@ The format follows Keep a Changelog. This project adheres to Semantic Versioning
 
 ## [Unreleased]
 ### Added
+- Camera site mapping workflow: new configuration (`data$camera_sites`),
+- Camera site tile helper now warns when requested scale exceeds the LIST TASVEG visibility threshold; configuration adds `max_scale` and defaults to DPI 96.
+  helper functions, and targets (`camera_sites_file`, `camera_sites_data`,
+  `camera_sites_context`, `camera_sites_tile`, `camera_sites_map`) to visualise
+  wildlife camera deployments with LIST TASVEG basemap support.
 - Localmap branding and species occurrence framing across README and docs.
 - Species request workflow (`read_species_requests()`, `ala_resolve_species()`,
   `ala_fetch_occurrences()`) to query the Atlas of Living Australia via

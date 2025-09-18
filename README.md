@@ -56,6 +56,9 @@ Key targets available out of the box:
 - `topo_tile_map`: tile-based map (defaults to `Esri.WorldImagery`, with
   alternatives like `OpenTopoMap`) overlaying species
   and ancillary points for the configured extent
+- `camera_sites_tile`: basemap tile (WMS or placeholder) for the camera site extent.
+- `camera_sites_map`: effort-scaled wildlife camera map highlighting detections
+  (red) versus non-detections (light grey) and including scale/north markers.
 - `cfg`: configuration list
 - `raw_manifest`: parsed input manifest
 - `input_files`: file paths tracked as dependencies (format = "file")
@@ -65,6 +68,47 @@ Key targets available out of the box:
 - `report`: renders `reports/paper.qmd`
 
 See `docs/DEVELOPMENT.qmd` for project conventions and additional guidance.
+
+
+## Wildlife camera deployments
+
+Provide wildlife camera effort/observation data via `config/config.yaml` →
+`data$camera_sites`. The CSV is expected to contain `site`, `lat`, `lon`, `rd`
+(run days), and `obs` (detections for the target species). The configuration
+also selects a central site and half-width (km) to build a square bounding box,
+plus an optional WMS provider for basemap tiles. Example:
+
+```
+data:
+  camera_sites:
+    path: data/raw/lyr_op.csv
+    central_site: wc_s10_c5
+    bbox_half_km: 20
+    basemap:
+      provider: list_tasveg
+      type: wms
+      url: https://services.thelist.tas.gov.au/arcgis/services/Public/NaturalEnvironment/MapServer/WMSServer
+      layers: ["TASVEG_4.017789"]
+      styles: default
+      format: image/png
+      transparent: true
+      width: 2048
+      height: 2048
+      dpi: 96
+      max_scale: 100000
+      output_path: outputs/tiles/tasveg_camera_sites.png
+    map:
+      output_path: outputs/maps/camera_sites.png
+      zero_obs_colour: "#cccccc"
+      positive_obs_colour: "#d73027"
+```
+
+The pipeline reads the CSV (`camera_sites_data`), prepares the spatial extent
+(`camera_sites_context`), downloads or fabricates a tile (`camera_sites_tile`),
+and renders the final map (`camera_sites_map`). Update the provider details to
+match your LIST credentials or alternative WMS sources.
+
+LIST TASVEG layers only render up to their published visibility scale (≈1:100k). Configure `max_scale` in `config.yaml` and keep the requested extent, image size, and DPI within that limit (e.g., halve `bbox_half_km`, reduce `dpi`, or increase `width`/`height`). When the limit is exceeded the WMS returns a fully transparent PNG, so the helper now warns if the request is out of range.
 
 ## Species occurrence retrieval
 

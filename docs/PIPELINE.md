@@ -7,6 +7,7 @@ Current DAG (conceptual):
 - `cfg` -> `ala_config`
 - `cfg` -> `species_requests` -> `species_taxa` -> `species_occurrences` -> `species_map`
 - `cfg` -> `raw_manifest` -> `input_files` -> `data_preview` -> `combined_data` -> `manifest_summary` -> `report`
+- `cfg` -> `camera_sites_file` -> `camera_sites_data` -> `camera_sites_context` -> `camera_sites_tile` -> `camera_sites_map`
 
 Key targets:
 - `ala_config`: Configures `{galah}` using project settings or environment
@@ -31,6 +32,18 @@ Key targets:
 - `report`: Renders `reports/paper.qmd` to HTML.
 - `topo_tile_map`: Renders a tile-based occurrence map (OpenTopoMap by default)
   using slippy tiles with optional ancillary points.
+- `camera_sites_file`: Tracks the configured camera site CSV so changes rerun the
+  camera mapping workflow.
+- `camera_sites_data`: Reads the wildlife camera effort/observation table defined in
+  `config$data$camera_sites$path`.
+- `camera_sites_context`: Computes the square bounding box around the configured
+  central site and filters camera deployments that fall within the extent.
+- `camera_sites_tile`: Downloads (or places a placeholder for) a WMS basemap tile
+  from the configured provider (e.g., LIST TASVEG).
+  The helper checks the requested scale against `max_scale` (default 1:100k for LIST) and warns if the tile would render empty.
+- `camera_sites_map`: Renders an effort-scaled map with red markers for sites
+  detecting the focal species and grey markers for zero detections, including
+  scale bar and north arrow.
 
 To run locally (in RStudio Console):
 

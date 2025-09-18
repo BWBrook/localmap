@@ -36,7 +36,9 @@ Imports:
     sf,
     ggplot2,
     geosphere,
+    ggspatial,
     maptiles,
+    png,
     rnaturalearth,
     rnaturalearthdata,
     tidyterra

@@ -75,6 +75,47 @@ list(
     description = "Tile-based occurrence map using slippy tiles (OpenTopoMap by default)."
   ),
 
+  targets::tar_target(
+    camera_sites_file,
+    here::here(cfg$data$camera_sites$path),
+    format = "file",
+    description = "Camera site effort CSV defined in configuration."
+  ),
+  targets::tar_target(
+    camera_sites_data,
+    read_camera_sites(camera_sites_file),
+    description = "Camera site metrics including effort and observations."
+  ),
+  targets::tar_target(
+    camera_sites_context,
+    prepare_camera_site_context(
+      sites = camera_sites_data,
+      central_site = cfg$data$camera_sites$central_site,
+      half_width_km = cfg$data$camera_sites$bbox_half_km
+    ),
+    description = "Prepared spatial context (bounding box, filtered sites) for mapping camera deployments."
+  ),
+  targets::tar_target(
+    camera_sites_tile,
+    fetch_camera_wms_tile(
+      bbox_3857 = camera_sites_context$bbox_3857,
+      provider_cfg = cfg$data$camera_sites$basemap
+    ),
+    format = "file",
+    description = "Basemap tile fetched from the configured WMS provider for camera sites."
+  ),
+  targets::tar_target(
+    camera_sites_map,
+    render_camera_sites_map(
+      context = camera_sites_context,
+      tile_path = camera_sites_tile,
+      map_cfg = cfg$data$camera_sites$map
+    ),
+    format = "file",
+    description = "Camera site map with effort-scaled symbols and observation highlighting."
+  ),
+
+
   # Manifest of input files
   targets::tar_target(
     raw_manifest,

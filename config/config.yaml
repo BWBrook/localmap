@@ -40,6 +40,34 @@ default:
             lon: 144.0
           length_km: 400
         output_path: "outputs/maps/species_occurrences.png"
+    camera_sites:
+      path: "data/raw/lyr_op.csv"
+      central_site: "wc_s10_c5"
+      bbox_half_km: 20
+      basemap:
+        provider: "list_tasveg"
+        type: "wms"
+        url: "https://services.thelist.tas.gov.au/arcgis/services/Public/NaturalEnvironment/MapServer/WMSServer"
+        version: "1.3.0"
+        layers:
+          - "TASVEG_4.0_Groups55513"
+        crs: "EPSG:3857"        # safe for WMS 1.3.0 (no axis flip)
+        styles: "default"
+        format: "image/png"
+        max_scale: 100000
+        transparent: true
+        width: 2048
+        height: 2048
+        dpi: 96
+        output_path: "outputs/tiles/tasveg_camera_sites.png"
+      map:
+        output_path: "outputs/maps/camera_sites.png"
+        scale_bar_location: "bl"
+        north_arrow_location: "tr"
+        point_size_min: 2.0
+        point_size_max: 8.0
+        zero_obs_colour: "#cccccc"
+        positive_obs_colour: "#d73027"
 
   ala:
     email: "barry.brook@utas.edu.au"
