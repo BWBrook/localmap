@@ -43,7 +43,7 @@ default:
     camera_sites:
       path: "data/raw/lyr_op.csv"
       central_site: "wc_s10_c5"
-      bbox_half_km: 20
+      bbox_half_km: 25
       basemap:
         provider: "list_tasveg"
         type: "wms"
@@ -60,6 +60,23 @@ default:
         height: 2048
         dpi: 96
         legend_path: "outputs/tiles/tasveg_camera_sites_legend.png"
+        overlays:
+          - name: roads
+            url: "https://services.thelist.tas.gov.au/arcgis/services/Public/TopographyAndRelief/MapServer/WMSServer"
+            layers:
+              - "State_Growth_Roads26192"         # WMS Name from GetCapabilities
+            styles: ""                             # optional; often blank for ArcGIS services
+            opacity: 0.65                          # 0–1, defaults to 0.6 if omitted
+            max_scale: 100000                      # optional; overrides the base max_scale
+            output_path: "outputs/tiles/roads.png" # optional; auto-generated if omitted
+          - name: towns
+            url: "https://services.thelist.tas.gov.au/arcgis/services/Public/CadastreAndAdministrative/MapServer/WMSServer"
+            layers:
+              - "Localities"
+            styles: ""
+            opacity: 0.75
+            max_scale: 100000                        
+            output_path: "outputs/tiles/towns.png"
         output_path: "outputs/tiles/tasveg_camera_sites.png"
       map:
         output_path: "outputs/maps/camera_sites.png"
@@ -69,6 +86,16 @@ default:
         point_size_max: 5.0
         zero_obs_colour: "#050505"
         positive_obs_colour: "#d73027"
+        show_graticule: true
+        graticule_colour: "#050505"
+        graticule_alpha: 0.4
+        graticule_label_size: 3
+      legend:
+        show: true
+        position: right
+        layout: overlay
+        width_fraction: 0.2
+        margin_fraction: 0.05
 
   ala:
     email: "barry.brook@utas.edu.au"

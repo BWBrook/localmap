@@ -44,7 +44,8 @@ Key targets:
   The helper checks the requested scale against `max_scale` (default 1:100k for LIST) and warns if the tile would render empty.
 - `camera_sites_map`: Renders an effort-scaled map with red markers for sites
   detecting the focal species and grey markers for zero detections, including
-  scale bar, north arrow, optional graticules, and an optional WMS legend inset.
+  scale bar, north arrow, optional graticules, a configurable WMS legend inset,
+  and optional overlay tiles (e.g., roads or town labels).
 
 To run locally (in RStudio Console):
 

@@ -361,6 +361,41 @@ camera_sites_fetch_legend <- function(basemap_cfg, legend_cfg) {
   writeBin(body, path)
   path
 }
+
+
+camera_sites_fetch_overlay_tiles <- function(bbox_3857,
+                                             overlays,
+                                             base_cfg) {
+  fn_env <- environment()
+  import::from("here", here, .into = fn_env)
+  if (is.null(overlays) || length(overlays) == 0L) {
+    return(list())
+  }
+  results <- list()
+  for (idx in seq_along(overlays)) {
+    overlay_cfg <- overlays[[idx]]
+    if (is.null(overlay_cfg)) {
+      next
+    }
+    if (is.null(overlay_cfg$url) || is.null(overlay_cfg$layers)) {
+      next
+    }
+    merged <- overlay_cfg
+    merged$width <- camera_sites_default(overlay_cfg$width, camera_sites_default(base_cfg$width, 2048L))
+    merged$height <- camera_sites_default(overlay_cfg$height, camera_sites_default(base_cfg$height, 2048L))
+    merged$dpi <- camera_sites_default(overlay_cfg$dpi, camera_sites_default(base_cfg$dpi, 96))
+    merged$max_scale <- camera_sites_default(overlay_cfg$max_scale, camera_sites_default(base_cfg$max_scale, NA_real_))
+    merged$output_path <- camera_sites_default(overlay_cfg$output_path, here::here("outputs", "tiles", sprintf("camera_sites_overlay_%02d.png", idx)))
+    path <- fetch_camera_wms_tile(bbox_3857 = bbox_3857, provider_cfg = merged)
+    if (!is.null(path) && nzchar(path) && file.exists(path)) {
+      results[[length(results) + 1L]] <- list(
+        path = path,
+        opacity = camera_sites_default(overlay_cfg$opacity, 0.6)
+      )
+    }
+  }
+  results
+}
 render_camera_sites_map <- function(context,
                                     tile_path = NULL,
                                     map_cfg = NULL) {
@@ -368,7 +403,7 @@ render_camera_sites_map <- function(context,
   import::from("checkmate", assert_list, .into = fn_env)
   import::from("ggplot2", annotation_raster, coord_sf, geom_sf, geom_sf_text, ggplot, ggsave, scale_colour_identity, scale_fill_identity, scale_size_identity, theme_void, .into = fn_env)
   import::from("ggspatial", annotation_north_arrow, annotation_scale, north_arrow_orienteering, .into = fn_env)
-  import::from("grid", rasterGrob, .into = fn_env)
+  import::from("grid", rasterGrob, gpar, .into = fn_env)
   import::from("here", here, .into = fn_env)
   import::from("png", readPNG, .into = fn_env)
   import::from("rlang", warn, .into = fn_env)
@@ -458,6 +493,28 @@ render_camera_sites_map <- function(context,
         )
     } else {
       warn(sprintf("Failed to read tile image: %s", tile_path))
+    }
+  }
+
+  overlays_cfg <- camera_sites_default(context$basemap_cfg$overlays, list())
+  overlay_tiles <- camera_sites_fetch_overlay_tiles(context$bbox_3857, overlays_cfg, context$basemap_cfg)
+  if (length(overlay_tiles) > 0L) {
+    for (overlay in overlay_tiles) {
+      overlay_img <- try(readPNG(overlay$path), silent = TRUE)
+      if (!inherits(overlay_img, "try-error")) {
+        opacity <- camera_sites_default(overlay$opacity, 0.6)
+        overlay_grob <- rasterGrob(overlay_img, interpolate = TRUE, gp = grid::gpar(alpha = opacity))
+        plot_obj <- plot_obj +
+          ggplot2::annotation_custom(
+            overlay_grob,
+            xmin = bbox["xmin"],
+            xmax = bbox["xmax"],
+            ymin = bbox["ymin"],
+            ymax = bbox["ymax"]
+          )
+      } else {
+        warn(sprintf("Failed to read overlay image: %s", overlay$path))
+      }
     }
   }
 

@@ -7,7 +7,7 @@ The format follows Keep a Changelog. This project adheres to Semantic Versioning
 ## [Unreleased]
 ### Added
 - Camera site mapping workflow: new configuration (`data$camera_sites`),
-- Camera map now offers configurable graticules aligned to the bounding box extent and an optional WMS legend inset on the right-hand side.
+- Camera map now offers configurable graticules aligned to the bounding box extent, optional WMS overlay tiles (e.g., roads, towns), and a configurable legend inset.
 - Camera site tile helper now warns when requested scale exceeds the LIST TASVEG visibility threshold; configuration adds `max_scale` and defaults to DPI 96.
   helper functions, and targets (`camera_sites_file`, `camera_sites_data`,
   `camera_sites_context`, `camera_sites_tile`, `camera_sites_map`) to visualise
