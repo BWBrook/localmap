@@ -96,7 +96,27 @@ default:
         layout: overlay
         width_fraction: 0.2
         margin_fraction: 0.05
-
+      stack:
+        glob: outputs/maps/camera_sites_*.png
+        input_dir: outputs/maps
+        pattern: camera_sites_.*\\.png$
+        order:
+          - "camera_sites_mccall_m"
+          - "camera_sites_mccall_p"
+          - "camera_sites_rosebery_m"
+          - "camera_sites_rosebery_p"
+          - "camera_sites_mt_roland_m"
+          - "camera_sites_mt_roland_p"
+        columns: 2    # 2 across × 3 down for six panels
+        rows: 3
+        output_path: outputs/maps/camera_sites_panel.png
+        gap_px: 6
+        background: "#ffffff"
+        labels:
+          values: ["a)", "b)", "c)", "d)", "e)", "f)"]
+          padding_px: 20
+          colour: "#050505"
+          font_size: 50
   ala:
     email: "barry.brook@utas.edu.au"
     atlas: "ALA"

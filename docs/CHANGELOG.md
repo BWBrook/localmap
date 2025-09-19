@@ -6,6 +6,12 @@ The format follows Keep a Changelog. This project adheres to Semantic Versioning
 
 ## [Unreleased]
 ### Added
+- `camera_sites_panel` target and stacking helper to combine multiple camera
+  site map PNGs into a vertically aligned comparison panel.
+- Panel stacking now deduplicates glob/dir matches, supports up to nine panes in
+  configurable grids (via `stack$columns`/`rows`), honours regex ordering, and
+  provides configurable bottom-right panel labels via
+  `data$camera_sites$stack$labels`.
 - Camera site mapping workflow: new configuration (`data$camera_sites`),
 - Camera map now offers configurable graticules aligned to the bounding box extent, optional WMS overlay tiles (e.g., roads, towns), and a configurable legend inset.
 - Camera site tile helper now warns when requested scale exceeds the LIST TASVEG visibility threshold; configuration adds `max_scale` and defaults to DPI 96.

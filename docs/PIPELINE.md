@@ -7,7 +7,7 @@ Current DAG (conceptual):
 - `cfg` -> `ala_config`
 - `cfg` -> `species_requests` -> `species_taxa` -> `species_occurrences` -> `species_map`
 - `cfg` -> `raw_manifest` -> `input_files` -> `data_preview` -> `combined_data` -> `manifest_summary` -> `report`
-- `cfg` -> `camera_sites_file` -> `camera_sites_data` -> `camera_sites_context` -> `camera_sites_tile` -> `camera_sites_map`
+- `cfg` -> `camera_sites_file` -> `camera_sites_data` -> `camera_sites_context` -> `camera_sites_tile` -> `camera_sites_map` -> `camera_sites_panel`
 
 Key targets:
 - `ala_config`: Configures `{galah}` using project settings or environment
@@ -46,6 +46,10 @@ Key targets:
   detecting the focal species and grey markers for zero detections, including
   scale bar, north arrow, optional graticules, a configurable WMS legend inset,
   and optional overlay tiles (e.g., roads or town labels).
+- `camera_sites_panel`: Gathers map PNGs from the configured glob/directory,
+  removes duplicates, and assembles up to nine panels (grid size controlled via
+  `stack$columns`/`rows`, with regex-based ordering from `stack$order`) while
+  optionally annotating each panel with labels such as `a)`, `b)`, `c)`.
 
 To run locally (in RStudio Console):
 

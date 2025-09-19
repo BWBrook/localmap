@@ -59,6 +59,8 @@ Key targets available out of the box:
 - `camera_sites_tile`: basemap tile (WMS or placeholder) for the camera site extent.
 - `camera_sites_map`: effort-scaled wildlife camera map highlighting detections
   (red) versus non-detections (light grey) and including scale/north markers.
+- `camera_sites_panel`: vertically stacked composite of camera site maps (e.g.,
+  regional variants).
 - `cfg`: configuration list
 - `raw_manifest`: parsed input manifest
 - `input_files`: file paths tracked as dependencies (format = "file")
@@ -97,7 +99,15 @@ data:
       dpi: 96
       max_scale: 100000
       legend_path: outputs/tiles/tasveg_camera_sites_legend.png
-      overlays: []
+      overlays:
+        - name: roads
+          url: https://services.thelist.tas.gov.au/arcgis/services/Public/TopographyAndRelief/MapServer/WMSServer
+          layers: ["State_Growth_Roads26192"]
+          opacity: 0.65
+        - name: towns
+          url: https://services.thelist.tas.gov.au/arcgis/services/Public/CadastreAndAdministrative/MapServer/WMSServer
+          layers: ["Localities"]
+          opacity: 0.75
       output_path: outputs/tiles/tasveg_camera_sites.png
     map:
       output_path: outputs/maps/camera_sites.png
@@ -113,12 +123,39 @@ data:
         layout: overlay
         width_fraction: 0.2
         margin_fraction: 0.05
+    stack:
+      glob: outputs/maps/camera_sites_*.png
+      input_dir: outputs/maps
+      pattern: camera_sites_.*\\.png$
+      order:
+        - "camera_sites_north"
+        - "camera_sites_central"
+        - "camera_sites_south"
+        - "camera_sites_east"
+        - "camera_sites_west"
+        - "camera_sites_coast"
+      columns: 3    # 3 across × 2 down for six panels
+      rows: 2
+      output_path: outputs/maps/camera_sites_panel.png
+      gap_px: 6
+      labels:
+        values: ["a)", "b)", "c)", "d)", "e)", "f)"]
+        padding_px: 20
+        colour: "#050505"
 ```
 
 The pipeline reads the CSV (`camera_sites_data`), prepares the spatial extent
 (`camera_sites_context`), downloads or fabricates a tile (`camera_sites_tile`),
-and renders the final map (`camera_sites_map`). Update the provider details to
-match your LIST credentials or alternative WMS sources.
+and renders the final map (`camera_sites_map`). When multiple site-specific
+maps exist (e.g., different focal centres saved to `outputs/maps/camera_sites_*.png`),
+`camera_sites_panel` deduplicates the matched PNGs and assembles up to nine
+panels. Supply `stack$columns`/`stack$rows` to choose your grid (defaults to a
+single column for ≤3 maps, otherwise 3 columns). The `stack$order` vector is
+evaluated in sequence using regular expressions matched against the PNG
+filenames—use it to force a six-panel layout like `north`, `central`, `south`,
+`east`, `west`, `coast` into a 3×2 grid. Labels (default `a)`–`i)`) render in the
+bottom-right corner and are customisable or optional via `stack$labels`. Update
+the provider details to match your LIST credentials or alternative WMS sources.
 
 If the requested extent, dpi, and image size exceed the service visibility (≈1:100k for TASVEG), `prepare_camera_site_context()` automatically clamps the half-width to keep the request within range and the map warns when a tile would render empty. Graticule styling is configurable via `show_graticule` and related settings.
 

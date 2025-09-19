@@ -115,6 +115,15 @@ list(
     format = "file",
     description = "Camera site map with effort-scaled symbols and observation highlighting."
   ),
+  targets::tar_target(
+    camera_sites_panel,
+    camera_sites_stack_maps(
+      stack_cfg = cfg$data$camera_sites$stack,
+      prerequisites = camera_sites_map
+    ),
+    format = "file",
+    description = "Vertically stacked panel of camera site maps."
+  ),
 
 
   # Manifest of input files
