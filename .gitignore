@@ -9,6 +9,7 @@
 # renv
 renv/library/
 renv/staging/
+renv/sandbox/
 
 # targets
 _targets/
