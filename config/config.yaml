@@ -99,7 +99,7 @@ default:
       stack:
         glob: outputs/maps/camera_sites_*.png
         input_dir: outputs/maps
-        pattern: camera_sites_.*\\.png$
+        pattern: camera_sites_.*\.png$
         order:
           - "camera_sites_mccall_m"
           - "camera_sites_mccall_p"
@@ -115,8 +115,19 @@ default:
         labels:
           values: ["a)", "b)", "c)", "d)", "e)", "f)"]
           padding_px: 20
-          colour: "#050505"
-          font_size: 50
+          colour: ["#050505", "#ffffff", "#050505", "#ffffff", "#050505", "#ffffff"]
+          font_size: 130
+        footer:
+          show: true
+          padding_px: 28
+          trim: true
+          trim_padding_px: 8
+          scale: 6
+          legend:
+            show: true
+            format: "image/png"
+            graphic_width: 900
+            graphic_height: 1300
   ala:
     email: "barry.brook@utas.edu.au"
     atlas: "ALA"

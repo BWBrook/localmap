@@ -325,3 +325,87 @@ test_that("camera_sites_stack_maps honours layout overrides and ordering", {
   panel_paths <- basename(attr(res, "panel_paths"))
   expect_equal(panel_paths[1:3], c("panel_b.png", "panel_a.png", "panel_c.png"))
 })
+
+test_that("camera_sites_stack_maps supports per-panel label colours and footer rows", {
+  tmp_dir <- tempfile(pattern = "camera_footer")
+  dir.create(tmp_dir)
+  on.exit(unlink(tmp_dir, recursive = TRUE), add = TRUE)
+
+  panel_paths <- file.path(tmp_dir, c("left.png", "right.png"))
+  for (i in seq_along(panel_paths)) {
+    img <- array(1, dim = c(10, 10, 4))
+    img[, , 1:3] <- if (i == 1L) 0.8 else 0.2
+    img[, , 4] <- 1
+    png::writePNG(img, target = panel_paths[[i]])
+  }
+
+  footer_path <- file.path(tmp_dir, "legend.png")
+  footer_img <- array(1, dim = c(6, 12, 4))
+  footer_img[, , 1] <- 0.95
+  footer_img[, , 2] <- 0.95
+  footer_img[, , 3] <- 0.95
+  footer_img[, , 4] <- 1
+  png::writePNG(footer_img, target = footer_path)
+
+  output_path <- file.path(tmp_dir, "stacked_with_footer.png")
+  res <- camera_sites_stack_maps(
+    stack_cfg = list(
+      paths = panel_paths,
+      columns = 2,
+      rows = 1,
+      gap_px = 2,
+      output_path = output_path,
+      labels = list(
+        values = c("a)", "b)"),
+        colour = c("#050505", "#ffffff"),
+        padding_px = 3,
+        font_size = 10
+      ),
+      footer = list(
+        show = TRUE,
+        path = footer_path,
+        padding_px = 3
+      )
+    ),
+    prerequisites = NULL
+  )
+
+  expect_true(file.exists(as.character(res)))
+  expect_equal(basename(attr(res, "footer_path")), "legend.png")
+
+  stacked <- png::readPNG(as.character(res))
+  expect_equal(dim(stacked)[2], 22)
+  expect_equal(dim(stacked)[1], 19)
+})
+
+test_that("camera_sites_stack_maps excludes output file when matching inputs", {
+  tmp_dir <- tempfile(pattern = "camera_exclude_output")
+  dir.create(tmp_dir)
+  on.exit(unlink(tmp_dir, recursive = TRUE), add = TRUE)
+
+  img <- array(1, dim = c(8, 8, 4))
+  img[, , 1] <- 0.6
+  img[, , 2] <- 0.6
+  img[, , 3] <- 0.6
+  img[, , 4] <- 1
+  png::writePNG(img, target = file.path(tmp_dir, "camera_sites_a.png"))
+  png::writePNG(img, target = file.path(tmp_dir, "camera_sites_b.png"))
+
+  output_path <- file.path(tmp_dir, "camera_sites_panel.png")
+  png::writePNG(img, target = output_path)
+
+  res <- camera_sites_stack_maps(
+    stack_cfg = list(
+      glob = file.path(tmp_dir, "camera_sites_*.png"),
+      output_path = output_path,
+      columns = 2,
+      rows = 1
+    ),
+    prerequisites = NULL
+  )
+
+  expect_true(file.exists(as.character(res)))
+  panel_paths <- basename(attr(res, "panel_paths"))
+  expect_false("camera_sites_panel.png" %in% panel_paths)
+  expect_equal(length(panel_paths), 2L)
+})

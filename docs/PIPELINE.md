@@ -49,7 +49,9 @@ Key targets:
 - `camera_sites_panel`: Gathers map PNGs from the configured glob/directory,
   removes duplicates, and assembles up to nine panels (grid size controlled via
   `stack$columns`/`rows`, with regex-based ordering from `stack$order`) while
-  optionally annotating each panel with labels such as `a)`, `b)`, `c)`.
+  optionally annotating each panel with labels such as `a)`, `b)`, `c)` (single
+  or per-panel colour vectors) and optionally appending a centered footer legend
+  row generated from WMS `GetLegendGraphic`.
 
 To run locally (in RStudio Console):
 

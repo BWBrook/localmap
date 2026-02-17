@@ -12,6 +12,9 @@ The format follows Keep a Changelog. This project adheres to Semantic Versioning
   configurable grids (via `stack$columns`/`rows`), honours regex ordering, and
   provides configurable bottom-right panel labels via
   `data$camera_sites$stack$labels`.
+- Camera panel stacking now supports per-panel label colours and an optional
+  centered footer image row (`stack$footer`), including direct WMS legend
+  generation for larger manuscript-ready legend keys.
 - Camera site mapping workflow: new configuration (`data$camera_sites`),
 - Camera map now offers configurable graticules aligned to the bounding box extent, optional WMS overlay tiles (e.g., roads, towns), and a configurable legend inset.
 - Camera site tile helper now warns when requested scale exceeds the LIST TASVEG visibility threshold; configuration adds `max_scale` and defaults to DPI 96.
@@ -54,6 +57,13 @@ The format follows Keep a Changelog. This project adheres to Semantic Versioning
 - Default species map styling now hides the title/legend, removes the bounding
   box overlay, and uses smaller green points (configurable via
   `data$occurrence$map`).
+- Camera panel stacking now excludes `stack$output_path` from discovered panel
+  inputs to prevent accidental self-inclusion on reruns.
+- Camera panel figure defaults now use larger panel labels (`font_size: 130`)
+  and map subpanels for manuscript assembly are rendered without in-map TASVEG
+  legend insets when a shared footer legend is used.
 
 ### Fixed
-- n/a
+- Corrected the manually regenerated `camera_sites_mt_roland_m.png` basemap
+  extent by using the intended Mt Roland center site (`vde`) and rebuilt the
+  panel composite.

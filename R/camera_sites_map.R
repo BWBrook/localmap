@@ -742,7 +742,8 @@ camera_sites_create_graticule <- function(bbox_4326) {
 
 
 camera_sites_stack_maps <- function(stack_cfg,
-                                    prerequisites = NULL) {
+                                    prerequisites = NULL,
+                                    basemap_cfg = NULL) {
   fn_env <- environment()
   import::from("checkmate", assert_character, assert_list, assert_numeric, assert_string, .into = fn_env)
   import::from("grDevices", col2rgb, dev.off, png, .into = fn_env)
@@ -879,6 +880,17 @@ camera_sites_stack_maps <- function(stack_cfg,
   collected_paths <- normalizePath(collected_paths, winslash = "/", mustWork = TRUE)
   collected_paths <- sort(unique(collected_paths))
 
+  output_path <- camera_sites_default(stack_cfg$output_path, here("outputs", "maps", "camera_sites_panel.png"))
+  output_path <- normalise_output_path(output_path)
+  output_norm <- normalizePath(output_path, winslash = "/", mustWork = FALSE)
+  collected_paths <- collected_paths[collected_paths != output_norm]
+  if (length(collected_paths) == 0L) {
+    abort(
+      "No camera site map images found for stacking after excluding the panel output path.",
+      class = "camera_sites_stack_missing_inputs"
+    )
+  }
+
   preferred_order <- stack_cfg$order
   if (!is.null(preferred_order)) {
     preferred_order <- as.character(unlist(preferred_order, use.names = FALSE))
@@ -901,6 +913,8 @@ camera_sites_stack_maps <- function(stack_cfg,
     }
   }
 
+  dir.create(dirname(output_path), recursive = TRUE, showWarnings = FALSE)
+
   max_panels <- camera_sites_default(stack_cfg$max_panels, 9L)
   assert_numeric(max_panels, len = 1L, lower = 1, upper = 9)
   max_panels <- as.integer(round(max_panels))
@@ -908,10 +922,6 @@ camera_sites_stack_maps <- function(stack_cfg,
     warn(sprintf("Camera site stack limited to first %d panels (of %d found).", max_panels, length(collected_paths)))
     collected_paths <- collected_paths[seq_len(max_panels)]
   }
-
-  output_path <- camera_sites_default(stack_cfg$output_path, here("outputs", "maps", "camera_sites_panel.png"))
-  output_path <- normalise_output_path(output_path)
-  dir.create(dirname(output_path), recursive = TRUE, showWarnings = FALSE)
 
   gap_px <- camera_sites_default(stack_cfg$gap_px, 6)
   assert_numeric(gap_px, len = 1L, lower = 0)
@@ -950,10 +960,39 @@ camera_sites_stack_maps <- function(stack_cfg,
     label_values <- rep(label_values, length.out = length(collected_paths))
   }
   label_padding <- as.numeric(camera_sites_default(label_cfg$padding_px, 16))
-  label_colour <- camera_sites_default(label_cfg$colour, "#050505")
   label_font_size <- as.numeric(camera_sites_default(label_cfg$font_size, 28))
   label_font_family <- camera_sites_default(label_cfg$font_family, "")
   label_font_face <- camera_sites_default(label_cfg$font_face, "bold")
+
+  resolve_colours <- function(colour_input, n_items, default_colour, field_name) {
+    values <- colour_input
+    if (is.null(values)) {
+      values <- default_colour
+    }
+    values <- as.character(unlist(values, use.names = FALSE))
+    values <- trimws(values)
+    values <- values[nzchar(values)]
+    if (length(values) == 0L) {
+      values <- default_colour
+    }
+    for (value in values) {
+      valid <- try(col2rgb(value), silent = TRUE)
+      if (inherits(valid, "try-error")) {
+        abort(
+          sprintf("Invalid %s colour for camera site panel labels: %s", field_name, value),
+          class = "camera_sites_stack_invalid_colour"
+        )
+      }
+    }
+    rep(values, length.out = n_items)
+  }
+
+  label_colours <- resolve_colours(
+    colour_input = label_cfg$colour,
+    n_items = length(collected_paths),
+    default_colour = "#050505",
+    field_name = "label"
+  )
 
   read_rgba <- function(path) {
     img <- try(readPNG(path), silent = TRUE)
@@ -996,7 +1035,89 @@ camera_sites_stack_maps <- function(stack_cfg,
     )
   }
 
-  annotate_label <- function(img, label_text) {
+  align_channels <- function(img, target_channels) {
+    current_channels <- dim(img)[3]
+    if (current_channels == target_channels) {
+      return(img)
+    }
+    if (current_channels > target_channels) {
+      return(img[, , seq_len(target_channels), drop = FALSE])
+    }
+
+    dims <- dim(img)
+    aligned <- array(1, dim = c(dims[1], dims[2], target_channels))
+    aligned[, , seq_len(current_channels)] <- img
+
+    if (current_channels == 1L && target_channels >= 3L) {
+      aligned[, , 2] <- img[, , 1]
+      aligned[, , 3] <- img[, , 1]
+    }
+    if (target_channels >= 4L && current_channels < 4L) {
+      aligned[, , 4] <- 1
+    }
+    aligned
+  }
+
+  trim_white_margins <- function(img,
+                                 white_threshold = 0.995,
+                                 padding_px = 4L) {
+    dims <- dim(img)
+    if (length(dims) < 3L || dims[1] < 1L || dims[2] < 1L) {
+      return(img)
+    }
+
+    red <- img[, , 1]
+    green <- if (dims[3] >= 2L) img[, , 2] else red
+    blue <- if (dims[3] >= 3L) img[, , 3] else red
+    alpha <- if (dims[3] >= 4L) img[, , 4] else matrix(1, nrow = dims[1], ncol = dims[2])
+
+    is_near_white <- red >= white_threshold & green >= white_threshold & blue >= white_threshold
+    is_transparent <- alpha <= 0.01
+    has_content <- !(is_near_white | is_transparent)
+
+    rows <- which(rowSums(has_content) > 0)
+    cols <- which(colSums(has_content) > 0)
+    if (length(rows) == 0L || length(cols) == 0L) {
+      return(img)
+    }
+
+    padding_px <- as.integer(round(padding_px))
+    if (!is.finite(padding_px) || padding_px < 0L) {
+      padding_px <- 0L
+    }
+
+    r_start <- max(1L, min(rows) - padding_px)
+    r_end <- min(dims[1], max(rows) + padding_px)
+    c_start <- max(1L, min(cols) - padding_px)
+    c_end <- min(dims[2], max(cols) + padding_px)
+
+    img[r_start:r_end, c_start:c_end, , drop = FALSE]
+  }
+
+  scale_image_nearest <- function(img, scale_factor) {
+    if (!is.finite(scale_factor) || scale_factor <= 0) {
+      return(img)
+    }
+    if (abs(scale_factor - 1) < .Machine$double.eps^0.5) {
+      return(img)
+    }
+
+    dims <- dim(img)
+    old_h <- dims[1]
+    old_w <- dims[2]
+    channels <- dims[3]
+    new_h <- max(1L, as.integer(round(old_h * scale_factor)))
+    new_w <- max(1L, as.integer(round(old_w * scale_factor)))
+
+    row_idx <- as.integer(round(seq(1, old_h, length.out = new_h)))
+    col_idx <- as.integer(round(seq(1, old_w, length.out = new_w)))
+    row_idx <- pmin(pmax(row_idx, 1L), old_h)
+    col_idx <- pmin(pmax(col_idx, 1L), old_w)
+
+    img[row_idx, col_idx, seq_len(channels), drop = FALSE]
+  }
+
+  annotate_label <- function(img, label_text, label_colour) {
     if (is.null(label_text) || !nzchar(label_text)) {
       return(img)
     }
@@ -1030,7 +1151,11 @@ camera_sites_stack_maps <- function(stack_cfg,
   images <- lapply(seq_along(collected_paths), function(idx) {
     img <- read_rgba(collected_paths[[idx]])
     if (length(label_values) >= idx && nzchar(label_values[[idx]])) {
-      img <- annotate_label(img, label_values[[idx]])
+      img <- annotate_label(
+        img = img,
+        label_text = label_values[[idx]],
+        label_colour = label_colours[[idx]]
+      )
     }
     img
   })
@@ -1109,10 +1234,100 @@ camera_sites_stack_maps <- function(stack_cfg,
     panel[row_range, col_range, ] <- img
   }
 
-  writePNG(panel, target = output_path)
+  footer_cfg <- camera_sites_default(stack_cfg$footer, list())
+  if (!is.null(footer_cfg) && !is.list(footer_cfg)) {
+    abort(
+      "Footer configuration must be a list when supplied.",
+      class = "camera_sites_stack_invalid_footer"
+    )
+  }
+
+  footer_path <- NULL
+  footer_show <- isTRUE(camera_sites_default(footer_cfg$show, FALSE))
+  footer_padding <- as.numeric(camera_sites_default(footer_cfg$padding_px, gap_px))
+  footer_trim <- isTRUE(camera_sites_default(footer_cfg$trim, FALSE))
+  footer_trim_padding <- as.numeric(camera_sites_default(footer_cfg$trim_padding_px, 4))
+  footer_scale <- as.numeric(camera_sites_default(footer_cfg$scale, 1))
+  if (!is.finite(footer_padding) || footer_padding < 0) {
+    footer_padding <- gap_px
+  }
+  footer_padding <- as.integer(round(footer_padding))
+  if (!is.finite(footer_trim_padding) || footer_trim_padding < 0) {
+    footer_trim_padding <- 4
+  }
+  if (!is.finite(footer_scale) || footer_scale <= 0) {
+    footer_scale <- 1
+  }
+
+  if (footer_show) {
+    legend_cfg <- camera_sites_default(footer_cfg$legend, NULL)
+    if (is.list(legend_cfg)) {
+      legend_cfg$show <- TRUE
+      fetched_legend <- camera_sites_fetch_legend(
+        basemap_cfg = basemap_cfg,
+        legend_cfg = legend_cfg
+      )
+      if (!is.null(fetched_legend) && nzchar(fetched_legend) && file.exists(fetched_legend)) {
+        footer_path <- fetched_legend
+      }
+    }
+
+    if (is.null(footer_path)) {
+      footer_candidate <- camera_sites_default(footer_cfg$path, NULL)
+      if (!is.null(footer_candidate) && is.character(footer_candidate) && length(footer_candidate) == 1L && nzchar(footer_candidate)) {
+        footer_matches <- unique(c(footer_candidate, here(footer_candidate)))
+        footer_matches <- footer_matches[file.exists(footer_matches)]
+        if (length(footer_matches) > 0L) {
+          footer_path <- footer_matches[[1L]]
+        } else {
+          warn(sprintf("Camera site stack footer path not found: %s", footer_candidate))
+        }
+      } else if (is.null(legend_cfg)) {
+        warn("Camera site stack footer enabled but no footer path or legend configuration supplied.")
+      }
+    }
+  }
+
+  final_panel <- panel
+  if (!is.null(footer_path)) {
+    footer_img <- read_rgba(footer_path)
+    footer_img <- align_channels(footer_img, channels)
+    if (footer_trim) {
+      footer_img <- trim_white_margins(
+        footer_img,
+        padding_px = footer_trim_padding
+      )
+    }
+    footer_img <- scale_image_nearest(footer_img, footer_scale)
+    footer_height <- dim(footer_img)[1]
+    footer_width <- dim(footer_img)[2]
+
+    final_width <- max(panel_width, footer_width)
+    final_height <- panel_height + footer_padding + footer_height
+    final_panel <- array(1, dim = c(final_height, final_width, channels))
+    for (idx in seq_len(min(3, channels))) {
+      final_panel[, , idx] <- bg_rgb[min(idx, length(bg_rgb))]
+    }
+    if (channels >= 4L) {
+      final_panel[, , 4] <- 1
+    }
+
+    panel_col_start <- as.integer(floor((final_width - panel_width) / 2)) + 1L
+    panel_col_end <- panel_col_start + panel_width - 1L
+    final_panel[seq_len(panel_height), panel_col_start:panel_col_end, ] <- panel
+
+    footer_col_start <- as.integer(floor((final_width - footer_width) / 2)) + 1L
+    footer_col_end <- footer_col_start + footer_width - 1L
+    footer_row_start <- panel_height + footer_padding + 1L
+    footer_row_end <- footer_row_start + footer_height - 1L
+    final_panel[footer_row_start:footer_row_end, footer_col_start:footer_col_end, ] <- footer_img
+  }
+
+  writePNG(final_panel, target = output_path)
   structure(
     output_path,
     panel_paths = collected_paths,
-    layout = list(columns = columns, rows = rows)
+    layout = list(columns = columns, rows = rows),
+    footer_path = footer_path
   )
 }

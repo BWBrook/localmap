@@ -141,7 +141,18 @@ data:
       labels:
         values: ["a)", "b)", "c)", "d)", "e)", "f)"]
         padding_px: 20
-        colour: "#050505"
+        colour: ["#050505", "#ffffff", "#050505", "#ffffff", "#050505", "#ffffff"]
+        font_size: 130
+      footer:
+        show: true
+        padding_px: 28
+        trim: true
+        trim_padding_px: 8
+        scale: 6
+        legend:
+          show: true
+          graphic_width: 900
+          graphic_height: 1300
 ```
 
 The pipeline reads the CSV (`camera_sites_data`), prepares the spatial extent
@@ -154,8 +165,16 @@ single column for ≤3 maps, otherwise 3 columns). The `stack$order` vector is
 evaluated in sequence using regular expressions matched against the PNG
 filenames—use it to force a six-panel layout like `north`, `central`, `south`,
 `east`, `west`, `coast` into a 3×2 grid. Labels (default `a)`–`i)`) render in the
-bottom-right corner and are customisable or optional via `stack$labels`. Update
-the provider details to match your LIST credentials or alternative WMS sources.
+bottom-right corner and are customisable or optional via `stack$labels`; label
+colours may be a single value or a per-panel vector. The stack step also
+excludes `stack$output_path` from input discovery, so reruns do not
+accidentally include prior panel composites. Optional `stack$footer` settings
+can append a centered legend/image row beneath the panel grid and may request a
+larger WMS legend (`footer$legend`) for improved readability in manuscripts.
+Footer imagery can optionally be auto-trimmed (`footer$trim`) and upscaled
+(`footer$scale`) before placement.
+Update the provider details to match your LIST credentials or alternative WMS
+sources.
 
 If the requested extent, dpi, and image size exceed the service visibility (≈1:100k for TASVEG), `prepare_camera_site_context()` automatically clamps the half-width to keep the request within range and the map warns when a tile would render empty. Graticule styling is configurable via `show_graticule` and related settings.
 

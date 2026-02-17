@@ -1,5 +1,32 @@
 # AGENT NOTES
 
+- 2026-02-17: Corrected `camera_sites_mt_roland_m` center-site mismatch.
+  - Regenerated `outputs/maps/camera_sites_mt_roland_m.png` using
+    `central_site = "vde"` (the previous manual rerender used an incorrect
+    central site and duplicated the McCall basemap extent).
+  - Rebuilt `outputs/maps/camera_sites_panel.png` so the corrected Mt Roland
+    basemap appears in the final 3x2+legend composite.
+
+- 2026-02-17: Refined camera panel styling after reviewer feedback.
+  - Increased panel label text size from 72 to 130 in
+    `data$camera_sites$stack$labels`.
+  - Re-rendered `camera_sites_mccall_m.png`, `camera_sites_rosebery_m.png`, and
+    `camera_sites_mt_roland_m.png` with `legend$show = FALSE` to remove in-map
+    TASVEG legend insets now that the shared footer legend is present.
+  - Rebuilt `outputs/maps/camera_sites_panel.png` via
+    `targets::tar_make(names = "camera_sites_panel", shortcut = TRUE)`.
+
+- 2026-02-16: Improved camera panel readability for manuscript figures.
+  - Extended `camera_sites_stack_maps()` to accept per-panel label colours,
+    preventing dark labels from disappearing on photo panels.
+  - Added optional `stack$footer` support to append a centered legend/image row
+    beneath panel grids; footer legends can now be fetched from WMS with custom
+    dimensions via `footer$legend`.
+  - Excluded `stack$output_path` from discovered input PNGs so reruns do not
+    accidentally include previous panel composites.
+  - Updated configuration/docs and expanded tests for footer rendering and
+    output-file exclusion.
+
 - 2025-09-19: Extended camera site panel stacking.
   - Enhanced `camera_sites_stack_maps()` to deduplicate glob/directories, accept
     explicit grid sizing via `columns`/`rows`, honour regex-based `order`, and

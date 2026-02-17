@@ -119,7 +119,8 @@ list(
     camera_sites_panel,
     camera_sites_stack_maps(
       stack_cfg = cfg$data$camera_sites$stack,
-      prerequisites = camera_sites_map
+      prerequisites = camera_sites_map,
+      basemap_cfg = cfg$data$camera_sites$basemap
     ),
     format = "file",
     description = "Vertically stacked panel of camera site maps."
